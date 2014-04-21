@@ -1,13 +1,14 @@
-function snap_in
+function snap_in(load_idx)
 % GUI snap_in
-% Purpose is to to input house inspection data
-
+% description: Purpose is to to input house inspection data
+% inputs: load_idx (int) - the index of the property to edit. 
+%                    if 0, then adds new entry   
+% 
 %---------------------------------------------------------------------
 % Initialization tasks
 
 % define CONSTANTS
 % data control constants
-
 DATA_INCREMENT = 200; % if columns must be grown, increase by DATA_INCREMENT
 NOTES_INCREMENT = 15;
 XSSTR = 5; %extra-small input string length
@@ -53,7 +54,7 @@ else
     data.local_max = 30;
     data.agent_max = 30;
     data.buyer_max = 50;
-
+    
     data.idx = 1; %unique to each property
     data.ideas_idx = 1;
     data.general_idx = 1;
@@ -231,7 +232,7 @@ street_edit = uicontrol('parent',h_fig,'Style','edit',...
 TMP_X=TMP_X+X_GAP+TXT_W;
 st_type_popup = uicontrol('parent',h_fig,'Style','popup',...
     'Units','normalized','String',{'Ave','Bowl','Cct','Cl','Cres','Ct',...
-    'Dr','Gr','St',},...
+    'Dr','Gr','Rd','St',},...
     'Position', [TMP_X,LINE_Y,STXT_W,POPUP_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
 suburb_popup = uicontrol('parent',h_fig,'Style','popup',...
@@ -264,11 +265,22 @@ inspect_end_edit = uicontrol('parent',h_fig,'Style','edit',...
     'Units','normalized','String','HH:MM','Position',...
     [TMP_X,LINE_Y,STXT_W,TXT_H],'Callback',{@edit_callback},...
     'userData',XSSTR);
-TMP_X=TMP_X+X_GAP+2*STXT_W;
-modern_check = uicontrol('parent',h_fig,'Style','check',...
-    'String','Modern','Units','normalized',...
+TMP_X=TMP_X+X_GAP+STXT_W;
+modern_text = uicontrol('parent',h_fig,'Style','text',...
+    'String','Modern:','Units','normalized',...
     'Position',[TMP_X,LINE_Y,STXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
+yes_radio = uicontrol('parent',h_fig,'Style','radio',...
+    'String','Yes','Units','normalized',...
+    'Position',[TMP_X,LINE_Y,XSTXT_W,TXT_H],'Callback',...
+    {@yes_radio_callback});
+TMP_X=TMP_X+X_GAP+XSTXT_W;
+no_radio = uicontrol('parent',h_fig,'Style','radio',...
+    'String','No','Units','normalized',...
+    'Position',[TMP_X,LINE_Y,XSTXT_W,TXT_H],'Callback',...
+    {@no_radio_callback});
+TMP_X=TMP_X+X_GAP+XSTXT_W;
+
 maisonette_check = uicontrol('parent',h_fig,'Style','check',...
     'String','Maisonette','Units','normalized',...
     'Position',[TMP_X,LINE_Y,TXT_W,TXT_H]);
@@ -579,18 +591,18 @@ TMP_X=TMP_X+X_GAP+NUM_W;
 shower_txt = uicontrol('parent',features_panel,'Style','text','String','shower(s),',...
     'Units','normalized','Position',[TMP_X,LINE_Y,STXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
-spa_popup = uicontrol('parent',features_panel,'Style','popup','Units','normalized',...
-    'String',NUMS,'Position',...
-    [TMP_X,LINE_Y,NUM_W,POPUP_H]);
-TMP_X=TMP_X+X_GAP+NUM_W;
-spa_txt = uicontrol('parent',features_panel,'Style','text','String','spa(s),',...
-    'Units','normalized','Position',[TMP_X,LINE_Y,XSTXT_W,TXT_H]);
-TMP_X=TMP_X+X_GAP+XSTXT_W;
 toilet_popup = uicontrol('parent',features_panel,'Style','popup','Units','normalized',...
     'String',NUMS,'Position',...
     [TMP_X,LINE_Y,NUM_W,POPUP_H]);
 TMP_X=TMP_X+X_GAP+NUM_W;
 toilet_txt = uicontrol('parent',features_panel,'Style','text','String','toilet(s),',...
+    'Units','normalized','Position',[TMP_X,LINE_Y,XSTXT_W,TXT_H]);
+TMP_X=TMP_X+X_GAP+XSTXT_W;
+spa_popup = uicontrol('parent',features_panel,'Style','popup','Units','normalized',...
+    'String',NUMS,'Position',...
+    [TMP_X,LINE_Y,NUM_W,POPUP_H]);
+TMP_X=TMP_X+X_GAP+NUM_W;
+spa_txt = uicontrol('parent',features_panel,'Style','text','String','spa(s),',...
     'Units','normalized','Position',[TMP_X,LINE_Y,XSTXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+XSTXT_W;
 bathroom_c_txt = uicontrol('parent',features_panel,'Style','text','Units','normalized',...
@@ -996,6 +1008,431 @@ sold_date_edit = uicontrol('parent',sales_panel,'Style','edit',...
 %---------------------------------------------------------------------
 %  Initialization tasks
 
+% if necessary load existing property for edit
+if load_idx ~= 0
+%   address
+    set(unit_no_edit,'String',data.unit_no(load_idx,:));
+    set(street_no_edit,'String',data.street_no(load_idx,:));
+    set(street_edit,'String',data.street(load_idx,:));
+    tmpHaystack = get(st_type_popup,'String');
+    tmpNeedle = deblank(data.st_type(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(st_type_popup,'Value',tmpAns);
+    tmpHaystack = get(suburb_popup,'String');
+    tmpNeedle = deblank(data.suburb(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(suburb_popup,'Value',tmpAns);
+%   inspection
+    set(inspect_date_edit,'String',data.inspect_date(load_idx,:));
+    set(inspect_start_edit,'String',data.inspect_start(load_idx,:));
+    set(inspect_end_edit,'String',data.inspect_end(load_idx,:));
+%   key data
+    if data.modern(load_idx) == 1
+        set(yes_radio,'Value',1);
+        set(no_radio,'Value',0);
+    else
+        set(no_radio,'Value',1);
+        set(yes_radio,'Value',0);
+    end
+    set(maisonette_check,'Value',data.maisonette(load_idx));
+    set(built_edit,'String',int2str(data.built(load_idx)));
+    set(last_reno_edit,'String',int2str(data.last_reno(load_idx)));
+    set(land_area_edit,'String',int2str(data.land_area(load_idx)));
+    set(floor_area_edit,'String',int2str(data.floor_area(load_idx)));
+    set(frontage_edit,'String',int2str(data.frontage(load_idx)));
+%   construction
+    tmpHaystack = get(construction_popup,'String');
+    tmpNeedle = deblank(data.construction(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(construction_popup,'Value',tmpAns);
+    tmpHaystack = get(construction_c_popup,'String');
+    tmpNeedle = int2str(data.construction_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(construction_c_popup,'Value',tmpAns);
+%   roofing
+    tmpHaystack = get(roofing_popup,'String');
+    tmpNeedle = deblank(data.roofing(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(roofing_popup,'Value',tmpAns);
+    tmpHaystack = get(roofing_c_popup,'String');
+    tmpNeedle = int2str(data.roofing_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(roofing_c_popup,'Value',tmpAns);
+    tmpHaystack = get(roofing_d_popup,'String');
+    tmpNeedle = int2str(data.roofing_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(roofing_d_popup,'Value',tmpAns);
+%   front yard
+    tmpHaystack = get(front_yard_c_popup,'String');
+    tmpNeedle = int2str(data.front_yard_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_yard_c_popup,'Value',tmpAns);
+    tmpHaystack = get(front_yard_d_popup,'String');
+    tmpNeedle = int2str(data.front_yard_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_yard_d_popup,'Value',tmpAns);
+    tmpHaystack = get(front_yard_s_popup,'String');
+    tmpNeedle = int2str(data.front_yard_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_yard_s_popup,'Value',tmpAns);
+%   front facade
+    tmpHaystack = get(front_facade_popup,'String');
+    tmpNeedle = deblank(data.front_facade(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_facade_popup,'Value',tmpAns);
+    tmpHaystack = get(front_facade_c_popup,'String');
+    tmpNeedle = int2str(data.front_facade_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_facade_c_popup,'Value',tmpAns);
+    tmpNeedle = int2str(data.front_facade_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(front_facade_d_popup,'Value',tmpAns);
+%   parking
+    tmpHaystack = get(garage_popup,'String');
+    tmpNeedle = int2str(data.garages(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(garage_popup,'Value',tmpAns);
+    tmpHaystack = get(carport_popup,'String');
+    tmpNeedle = int2str(data.carports(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(carport_popup,'Value',tmpAns);
+    tmpHaystack = get(secure_popup,'String');
+    tmpNeedle = int2str(data.secures(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(secure_popup,'Value',tmpAns);
+    tmpHaystack = get(offstreet_popup,'String');
+    tmpNeedle = int2str(data.offstreets(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(offstreet_popup,'Value',tmpAns);
+    tmpHaystack = get(parking_c_popup,'String');
+    tmpNeedle = int2str(data.parking_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(parking_c_popup,'Value',tmpAns);
+    tmpHaystack = get(parking_d_popup,'String');
+    tmpNeedle = int2str(data.parking_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(parking_d_popup,'Value',tmpAns);
+%   flooring
+    set(tile_check,'Value',data.tile(load_idx));
+    set(slate_check,'Value',data.slate(load_idx));
+    set(floorboard_check,'Value',data.floorboard(load_idx));
+    set(vinyl_check,'Value',data.vinyl(load_idx));
+    tmpHaystack = get(flooring_c_popup,'String');
+    tmpNeedle = int2str(data.flooring_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(flooring_c_popup,'Value',tmpAns);
+    tmpHaystack = get(flooring_d_popup,'String');
+    tmpNeedle = int2str(data.flooring_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(flooring_d_popup,'Value',tmpAns);
+%   kitchen
+    set(open_living_check,'Value',data.open_living(load_idx));
+    set(pantry_check,'Value',data.pantry(load_idx));
+    tmpHaystack = get(kitchen_c_popup,'String');
+    tmpNeedle = int2str(data.kitchen_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(kitchen_c_popup,'Value',tmpAns);
+    tmpHaystack = get(kitchen_d_popup,'String');
+    tmpNeedle = int2str(data.kitchen_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(kitchen_d_popup,'Value',tmpAns);
+    tmpHaystack = get(kitchen_s_popup,'String');
+    tmpNeedle = int2str(data.kitchen_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(kitchen_s_popup,'Value',tmpAns);    
+%   bathroom
+    tmpHaystack = get(bath_popup,'String');
+    tmpNeedle = int2str(data.baths(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bath_popup,'Value',tmpAns);
+    tmpHaystack = get(shower_popup,'String');
+    tmpNeedle = int2str(data.showers(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(shower_popup,'Value',tmpAns);
+    tmpHaystack = get(spa_popup,'String');
+    tmpNeedle = int2str(data.spas(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(spa_popup,'Value',tmpAns);
+    tmpHaystack = get(toilet_popup,'String');
+    tmpNeedle = int2str(data.toilets(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(toilet_popup,'Value',tmpAns);
+    tmpHaystack = get(bathroom_c_popup,'String');
+    tmpNeedle = int2str(data.bathroom_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bathroom_c_popup,'Value',tmpAns);
+    tmpHaystack = get(bathroom_d_popup,'String');
+    tmpNeedle = int2str(data.bathroom_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bathroom_d_popup,'Value',tmpAns);
+    tmpHaystack = get(bathroom_s_popup,'String');
+    tmpNeedle = int2str(data.bathroom_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bathroom_s_popup,'Value',tmpAns);    
+    set(heatlamp_check,'Value',data.heatlamp(load_idx));
+%   bedroom
+    tmpHaystack = get(bedroom_popup,'String');
+    tmpNeedle = int2str(data.bedrooms(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bedroom_popup,'Value',tmpAns);
+    tmpHaystack = get(wir_popup,'String');
+    tmpNeedle = int2str(data.wirs(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(wir_popup,'Value',tmpAns);
+    tmpHaystack = get(bir_popup,'String');
+    tmpNeedle = int2str(data.birs(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bir_popup,'Value',tmpAns);    
+    tmpHaystack = get(kids_popup,'String');
+    tmpNeedle = int2str(data.kids(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(kids_popup,'Value',tmpAns);
+    tmpHaystack = get(ensuite_popup,'String');
+    tmpNeedle = int2str(data.ensuites(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(ensuite_popup,'Value',tmpAns);
+    tmpHaystack = get(brt_popup,'String');
+    tmpNeedle = int2str(data.brts(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(brt_popup,'Value',tmpAns);    
+    tmpHaystack = get(bedroom_c_popup,'String');
+    tmpNeedle = int2str(data.bedroom_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bedroom_c_popup,'Value',tmpAns);
+    tmpHaystack = get(bedroom_d_popup,'String');
+    tmpNeedle = int2str(data.bedroom_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bedroom_d_popup,'Value',tmpAns);
+    tmpHaystack = get(bedroom_s_popup,'String');
+    tmpNeedle = int2str(data.bedroom_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(bedroom_s_popup,'Value',tmpAns);    
+%   climate control
+    tmpHaystack = get(heating_popup,'String');
+    tmpNeedle = int2str(data.heating(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(heating_popup,'Value',tmpAns);
+    tmpHaystack = get(cooling_popup,'String');
+    tmpNeedle = int2str(data.cooling(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(cooling_popup,'Value',tmpAns);
+    tmpHaystack = get(coverage_popup,'String');
+    tmpNeedle = int2str(data.coverage(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(coverage_popup,'Value',tmpAns);        
+%     backyard
+    tmpHaystack = get(back_yard_c_popup,'String');
+    tmpNeedle = int2str(data.back_yard_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(back_yard_c_popup,'Value',tmpAns);
+    tmpHaystack = get(back_yard_d_popup,'String');
+    tmpNeedle = int2str(data.back_yard_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(back_yard_d_popup,'Value',tmpAns);
+    tmpHaystack = get(back_yard_s_popup,'String');
+    tmpNeedle = int2str(data.back_yard_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(back_yard_s_popup,'Value',tmpAns);    
+    set(pergola_check,'Value',data.pergola(load_idx));
+    set(verandah_check,'Value',data.verandah(load_idx));
+    tmpHaystack = get(verandah_c_popup,'String');
+    tmpNeedle = int2str(data.verandah_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(verandah_c_popup,'Value',tmpAns);
+    tmpHaystack = get(verandah_d_popup,'String');
+    tmpNeedle = int2str(data.verandah_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(verandah_d_popup,'Value',tmpAns);
+    tmpHaystack = get(verandah_s_popup,'String');
+    tmpNeedle = int2str(data.verandah_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(verandah_s_popup,'Value',tmpAns);    
+    set(grass_check,'Value',data.grass(load_idx));
+    tmpHaystack = get(grass_c_popup,'String');
+    tmpNeedle = int2str(data.grass_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(grass_c_popup,'Value',tmpAns);
+    tmpHaystack = get(grass_d_popup,'String');
+    tmpNeedle = int2str(data.grass_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(grass_d_popup,'Value',tmpAns);
+    tmpHaystack = get(grass_s_popup,'String');
+    tmpNeedle = int2str(data.grass_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(grass_s_popup,'Value',tmpAns);    
+%   other features
+    set(swim_check,'Value',data.swim(load_idx));
+    tmpHaystack = get(swim_c_popup,'String');
+    tmpNeedle = int2str(data.swim_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(swim_c_popup,'Value',tmpAns);
+    tmpHaystack = get(swim_d_popup,'String');
+    tmpNeedle = int2str(data.swim_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(swim_d_popup,'Value',tmpAns);
+    tmpHaystack = get(swim_s_popup,'String');
+    tmpNeedle = int2str(data.swim_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(swim_s_popup,'Value',tmpAns);    
+    set(shed_check,'Value',data.shed(load_idx));
+    set(shed_edit,'String',data.shed_types(load_idx,:));
+    set(granny_flat_check,'Value',data.granny_flat(load_idx));
+    tmpHaystack = get(granny_flat_c_popup,'String');
+    tmpNeedle = int2str(data.granny_flat_c(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(granny_flat_c_popup,'Value',tmpAns);
+    tmpHaystack = get(granny_flat_d_popup,'String');
+    tmpNeedle = int2str(data.granny_flat_d(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(granny_flat_d_popup,'Value',tmpAns);
+    tmpHaystack = get(granny_flat_s_popup,'String');
+    tmpNeedle = int2str(data.granny_flat_s(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(granny_flat_s_popup,'Value',tmpAns);    
+%   comments
+    tmpIndexed = data.idea_key == load_idx;
+    set(ideas_edit,'string',data.idea_notes(tmpIndexed,:));
+    tmpIndexed = data.general_key == load_idx;
+    set(general_edit,'string',data.general_notes(tmpIndexed,:));
+    tmpIndexed = data.suburb_key == load_idx;
+    set(suburb_comment_edit,'string',data.suburb_notes(tmpIndexed,:));
+    tmpIndexed = data.street_key == load_idx;
+    set(street_comment_edit,'string',data.street_notes(tmpIndexed,:));
+    tmpIndexed = data.local_key == load_idx;
+    set(local_comment_edit,'string',data.local_notes(tmpIndexed,:));
+    tmpIndexed = data.agent_key == load_idx;
+    set(agent_edit,'string',data.agent_notes(tmpIndexed,:));
+    tmpIndexed = data.buyer_key == load_idx;
+    set(buyers_edit,'string',data.buyer_notes(tmpIndexed,:));
+%   sales
+    set(list_price_old_edit,'String',data.list_price_old(load_idx,:));
+    set(list_date_old_edit,'String',data.list_date_old(load_idx,:));
+    set(list_agent_old_edit,'String',data.list_agent_old(load_idx,:));
+    set(list_price_curr_edit,'String',data.list_price_curr(load_idx,:));
+    set(list_date_curr_edit,'String',data.list_date_curr(load_idx,:));
+    set(list_agent_curr_edit,'String',data.list_agent_curr(load_idx,:));
+    set(sold_price_edit,'String',data.sold_price(load_idx,:));
+    set(sold_date_edit,'String',data.sold_date(load_idx,:));
+    
+end
+
+
 % Move the GUI to the center of the screen.
 movegui(h_fig,'center')
 
@@ -1058,6 +1495,12 @@ features_callback(features_tab,0);
     
         %---------------------------------------------------------
 %        collect user data input to GUI
+        
+        % save over existing property if editing
+        if load_idx ~=0
+           idx_tmp = data.idx;
+           data.idx = load_idx;
+        end
 
         % store unit no (as chars)
         tmpVal = get(unit_no_edit,'String');
@@ -1114,30 +1557,45 @@ features_callback(features_tab,0);
         end
         
         % store modern boolean (as int8)
-        data.modern(data.idx) = int8(get(modern_check,'Value'));
+        if ~get(yes_radio,'Value') && ~get(no_radio,'Value')
+            errordlg('You must specify if modern or dated',...
+                'Specify Modern/Dated');
+            return;
+        end
+        data.modern(data.idx) = int8(get(yes_radio,'Value'));
         
         % store maisonette boolean (as int8)
         data.maisonette(data.idx) = int8(get(maisonette_check,'Value'));
         
         % store built year (as uint16)
         tmpVal = get(built_edit,'String');
-        data.built(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.built(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store last renovated year (as uint16)
         tmpVal = get(last_reno_edit,'String');
-        data.last_reno(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.last_reno(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store land area (as uint16)
         tmpVal = get(land_area_edit,'String');
-        data.land_area(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.land_area(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store floor area (as uint16)
         tmpVal = get(floor_area_edit,'String');
-        data.floor_area(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.floor_area(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store frontage (as uint8)
         tmpVal = get(frontage_edit,'String');
-        data.frontage(data.idx) = str2num(['uint8(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.frontage(data.idx) = str2num(['uint8(' tmpVal ')']);
+        end
         
         % store construction (as chars)
         tmpVal = get(construction_popup,'String');
@@ -1440,7 +1898,9 @@ features_callback(features_tab,0);
 
         % store shed descriptions (as chars)
         tmpVal = get(shed_edit,'String');
-        data.shed_types(data.idx,1:length(tmpVal)) = tmpVal;
+        if ~strcmp(tmpVal,'')
+            data.shed_types(data.idx,1:length(tmpVal)) = tmpVal;
+        end
         
         % store granny flat boolean (as int8)
         data.granny_flat(data.idx) = int8(get(granny_flat_check,'Value'));
@@ -1518,35 +1978,51 @@ features_callback(features_tab,0);
         
         % store old listing price (as uint16)
         tmpVal = get(list_price_old_edit,'String');
-        data.list_price_old(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.list_price_old(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store old listing date (as chars)
         tmpVal = get(list_date_old_edit,'String');
-        data.list_date_old(data.idx,1:length(tmpVal)) = tmpVal;
+        if ~strcmp(tmpVal,'')
+            data.list_date_old(data.idx,1:length(tmpVal)) = tmpVal;
+        end
         
         % store old listing agent (as chars)
         tmpVal = get(list_agent_old_edit,'String');
-        data.list_agent_old(data.idx,1:length(tmpVal)) = tmpVal;
+        if ~strcmp(tmpVal,'')
+            data.list_agent_old(data.idx,1:length(tmpVal)) = tmpVal;
+        end
         
         % store current listing price (as uint16)
         tmpVal = get(list_price_curr_edit,'String');
-        data.list_price_curr(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.list_price_curr(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store current listing date (as chars)
         tmpVal = get(list_date_curr_edit,'String');
-        data.list_date_curr(data.idx,1:length(tmpVal)) = tmpVal;
+        if ~strcmp(tmpVal,'')
+            data.list_date_curr(data.idx,1:length(tmpVal)) = tmpVal;
+        end
         
         % store current listing agent (as chars)
         tmpVal = get(list_agent_curr_edit,'String');
-        data.list_agent_curr(data.idx,1:length(tmpVal)) = tmpVal;        
-
+        if ~strcmp(tmpVal,'')
+            data.list_agent_curr(data.idx,1:length(tmpVal)) = tmpVal;
+        end
+        
         % store sold price (as uint16)
         tmpVal = get(sold_price_edit,'String');
-        data.sold_price(data.idx) = str2num(['uint16(' tmpVal ')']);
+        if ~strcmp(tmpVal,'')
+            data.sold_price(data.idx) = str2num(['uint16(' tmpVal ')']);
+        end
         
         % store sold date (as chars)
         tmpVal = get(sold_date_edit,'String');
-        data.sold_date(data.idx,1:length(tmpVal)) = tmpVal;
+        if ~strcmp(tmpVal,'')
+            data.sold_date(data.idx,1:length(tmpVal)) = tmpVal;
+        end
         
         %---------------------------------------------------------
         %       expand columns if necessary
@@ -1726,8 +2202,12 @@ features_callback(features_tab,0);
         end
         
         %---------------------------------------------------------        
-%       update the index for the next entry
-        data.idx = data.idx + 1;
+        if load_idx == 0 % new entry added
+            % update the index for the next entry
+            data.idx = data.idx + 1;
+        else % entry edited
+            data.idx = idx_tmp;
+        end
         
 %        save the updated data
         save(data_file,'data','-v6');
@@ -1747,7 +2227,7 @@ features_callback(features_tab,0);
 %             'Yes','No','Yes');
 %         switch selection,
 %             case 'Yes',
-                delete(gcf)
+        delete(h_fig)
 %             case 'No'
 %                 return
 %         end
@@ -1766,7 +2246,24 @@ features_callback(features_tab,0);
         end
         
     end
-        
+      
+%   yes radio button selected
+    function yes_radio_callback(source,eventdata)
+%         ensure the value of this radio button is the opposite of the 
+%         other radio button
+        val = get(source,'value');
+        set(no_radio,'value',~val);
+    
+    end
+
+%   no radio button selected
+    function no_radio_callback(source,eventdata)
+%         ensure the value of this radio button is the opposite of the 
+%         other radio button
+        val = get(source,'value');
+        set(yes_radio,'value',~val);
+    
+    end
 
 %---------------------------------------------------------------------
 %  Utility functions for snap_in
