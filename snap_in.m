@@ -183,12 +183,17 @@ else
 %   columns - sales
     data.list_price_old = zeros(data.max,1,'uint16');
     data.list_date_old = repmat(' ',data.max,SSTR);
-    data.list_agent_old = repmat(' ',data.max,SSTR);
+    data.list_agent_old = repmat(' ',data.max,LSTR);
     data.list_price_curr = zeros(data.max,1,'uint16');
     data.list_date_curr = repmat(' ',data.max,SSTR);
-    data.list_agent_curr = repmat(' ',data.max,SSTR);
+    data.list_agent_curr = repmat(' ',data.max,LSTR);
     data.sold_price = zeros(data.max,1,'uint16');
     data.sold_date = repmat(' ',data.max,SSTR);
+    
+%   agent names list: 
+    data.agent_names = repmat(' ',2,LSTR);
+    data.agent_names(1,1) = '-';
+    data.agent_names(2,1:7) = 'Add New';
     
 %   save data to disk
     save(data_file,'data','-v6');
@@ -954,9 +959,14 @@ list_agent_old_txt = uicontrol('parent',sales_panel,'Style','text',...
     'String','Agent:','Units','normalized',...
     'Position',[TMP_X,LINE_Y,STXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
+list_agent_old_popup = uicontrol('parent',sales_panel,'Style','popup',...
+    'Units','normalized','String',data.agent_names,'Position',...
+    [TMP_X,LINE_Y,1.4*POPUP_W,POPUP_H],'Callback',{@agent_old_callback}); 
+TMP_X=TMP_X+X_GAP+1.4*POPUP_W;
 list_agent_old_edit = uicontrol('parent',sales_panel,'Style','edit',...
     'Units','normalized','String','','Position',...
-    [TMP_X,LINE_Y,STXT_W,TXT_H],'Callback',{@edit_callback},'userData',LSTR);
+    [TMP_X,LINE_Y,1.4*TXT_W,TXT_H],'Callback',{@edit_callback},...
+    'userData',LSTR,'Visible','off');
 
 
 % current listing components
@@ -982,9 +992,14 @@ list_agent_curr_txt = uicontrol('parent',sales_panel,'Style','text',...
     'String','Agent:','Units','normalized',...
     'Position',[TMP_X,LINE_Y,STXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
+list_agent_curr_popup = uicontrol('parent',sales_panel,'Style','popup',...
+    'Units','normalized','String',data.agent_names,'Position',...
+    [TMP_X,LINE_Y,1.4*POPUP_W,POPUP_H],'Callback',{@agent_curr_callback}); 
+TMP_X=TMP_X+X_GAP+1.4*POPUP_W;
 list_agent_curr_edit = uicontrol('parent',sales_panel,'Style','edit',...
     'Units','normalized','String','','Position',...
-    [TMP_X,LINE_Y,STXT_W,TXT_H],'Callback',{@edit_callback},'userData',LSTR);
+    [TMP_X,LINE_Y,1.4*TXT_W,TXT_H],'Callback',{@edit_callback},...
+    'userData',LSTR,'Visible','off');
 
 % sold components
 LINE_Y= LINE_Y - POPUP_H - Y_GAP/2;
@@ -1423,10 +1438,20 @@ if load_idx ~= 0
 %   sales
     set(list_price_old_edit,'String',data.list_price_old(load_idx,:));
     set(list_date_old_edit,'String',data.list_date_old(load_idx,:));
-    set(list_agent_old_edit,'String',data.list_agent_old(load_idx,:));
+    tmpHaystack = get(list_agent_old_popup,'String');
+    tmpNeedle = deblank(data.list_agent_old(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,cellstr(tmpHaystack),length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(list_agent_old_popup,'Value',tmpAns);
     set(list_price_curr_edit,'String',data.list_price_curr(load_idx,:));
     set(list_date_curr_edit,'String',data.list_date_curr(load_idx,:));
-    set(list_agent_curr_edit,'String',data.list_agent_curr(load_idx,:));
+    tmpHaystack = get(list_agent_curr_popup,'String');
+    tmpNeedle = deblank(data.list_agent_curr(load_idx,:));
+    tmpIndexed = strncmp(tmpNeedle,cellstr(tmpHaystack),length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(list_agent_curr_popup,'Value',tmpAns);
     set(sold_price_edit,'String',data.sold_price(load_idx,:));
     set(sold_date_edit,'String',data.sold_date(load_idx,:));
     
@@ -1989,11 +2014,35 @@ features_callback(features_tab,0);
         end
         
         % store old listing agent (as chars)
-        tmpVal = get(list_agent_old_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.list_agent_old(data.idx,1:length(tmpVal)) = tmpVal;
-        end
-        
+        %first check if user wants to add to the names list
+        if strcmpi(get(list_agent_old_edit,'Visible'),'on')
+%          implies that user intends to add agent
+%           check that not empty string
+            new_agent = get(list_agent_old_edit,'string');
+            if strcmp(new_agent,'') 
+                errordlg('Attempted to add old agent as empty string',...
+                    'Agent Must Have a Name');
+                return;
+            end
+            
+            %add the name to the names list
+            data.agent_names = [data.agent_names; repmat(' ',1,LSTR)];
+            data.agent_names(end,1:length(new_agent)) = new_agent;
+%           sort it
+            data.agent_names = [data.agent_names(1:2,:); ...
+                                sortrows(data.agent_names(3:end,:))];
+            
+%           add the name as this properties old listing agent
+            data.list_agent_old(data.idx,1:length(new_agent)) = new_agent;
+            
+        else % otherwise, simply grab it from the popup box
+                            
+                tmpVal = get(list_agent_old_popup,'String');
+                tmpVal = deblank(tmpVal(get(list_agent_old_popup,'Value'),:));
+                data.list_agent_old(data.idx,1:length(tmpVal)) = tmpVal;
+
+        end  
+
         % store current listing price (as uint16)
         tmpVal = get(list_price_curr_edit,'String');
         if ~strcmp(tmpVal,'')
@@ -2007,10 +2056,35 @@ features_callback(features_tab,0);
         end
         
         % store current listing agent (as chars)
-        tmpVal = get(list_agent_curr_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.list_agent_curr(data.idx,1:length(tmpVal)) = tmpVal;
-        end
+        
+        %first check if user wants to add to the names list
+        if strcmpi(get(list_agent_curr_edit,'Visible'),'on')
+%          implies that user intends to add agent
+%           check that not empty string
+            new_agent = get(list_agent_curr_edit,'string');
+            if strcmp(new_agent,'') 
+                errordlg('Attempted to add current agent as empty string',...
+                    'Agent Must Have a Name');
+                return;
+            end
+            
+            %add the name to the names list
+            data.agent_names = [data.agent_names; repmat(' ',1,LSTR)];
+            data.agent_names(end,1:length(new_agent)) = new_agent;
+%           sort it
+            data.agent_names = [data.agent_names(1:2,:); ...
+                                sortrows(data.agent_names(3:end,:))];
+            
+%           add the name as this properties current listing agent
+            data.list_agent_curr(data.idx,1:length(new_agent)) = new_agent;
+            
+        else % otherwise, simply grab it from the popup box
+                            
+                tmpVal = get(list_agent_curr_popup,'String');
+                tmpVal = deblank(tmpVal(get(list_agent_curr_popup,'Value'),:));
+                data.list_agent_curr(data.idx,1:length(tmpVal)) = tmpVal;
+                
+        end             
         
         % store sold price (as uint16)
         tmpVal = get(sold_price_edit,'String');
@@ -2264,6 +2338,33 @@ features_callback(features_tab,0);
         set(yes_radio,'value',~val);
     
     end
+
+%   user made a selection in the agent names popup list
+%   ordinarily this is of no interest unless they opt to 
+%   enter a new name
+    function agent_old_callback(source,eventdata)
+        selection = get(source,'string');
+        selection = deblank(selection(get(source,'Value'),:));
+        if strcmp(selection,'Add New')
+           set(list_agent_old_edit,'Visible','On');
+        else
+            set(list_agent_old_edit,'Visible','Off');
+        end
+    end
+
+%   user made a selection in the agent names popup list
+%   ordinarily this is of no interest unless they opt to 
+%   enter a new name
+    function agent_curr_callback(source,eventdata)
+        selection = get(source,'string');
+        selection = deblank(selection(get(source,'Value'),:));
+        if strcmp(selection,'Add New')
+           set(list_agent_curr_edit,'Visible','On');
+        else
+            set(list_agent_curr_edit,'Visible','Off');
+        end
+    end
+
 
 %---------------------------------------------------------------------
 %  Utility functions for snap_in

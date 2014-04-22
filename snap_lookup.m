@@ -117,7 +117,7 @@ set(h_fig,'Visible','on');
     end
 
 %---------------------------------------------------------------------
-%  Utility functions for snap_in
+%  Utility functions for snap_lookup
 
 
 end
