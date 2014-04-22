@@ -1,6 +1,6 @@
 function snap_in(load_idx)
 % GUI snap_in
-% description: Purpose is to to input house inspection data
+% description: Purpose is to input house inspection data
 % inputs: load_idx (int) - the index of the property to edit. 
 %                    if 0, then adds new entry   
 % 
@@ -181,13 +181,13 @@ else
     data.buyer_key = zeros(data.buyer_max,1,'uint16');
     data.buyer_notes = repmat(' ',data.buyer_max,XLSTR);
 %   columns - sales
-    data.list_price_old = zeros(data.max,1,'uint16');
+    data.list_price_old = zeros(data.max,1,'uint32');
     data.list_date_old = repmat(' ',data.max,SSTR);
     data.list_agent_old = repmat(' ',data.max,LSTR);
-    data.list_price_curr = zeros(data.max,1,'uint16');
+    data.list_price_curr = zeros(data.max,1,'uint32');
     data.list_date_curr = repmat(' ',data.max,SSTR);
     data.list_agent_curr = repmat(' ',data.max,LSTR);
-    data.sold_price = zeros(data.max,1,'uint16');
+    data.sold_price = zeros(data.max,1,'uint32');
     data.sold_date = repmat(' ',data.max,SSTR);
     
 %   agent names list: 
@@ -1528,13 +1528,13 @@ features_callback(features_tab,0);
         end
 
         % store unit no (as chars)
-        tmpVal = get(unit_no_edit,'String');
+        tmpVal = deblank(get(unit_no_edit,'String'));
         if ~strcmp(tmpVal,'Unit #')
             data.unit_no(data.idx,1:length(tmpVal)) = tmpVal;    
         end
         
         % store house no (as chars)
-        tmpVal = get(street_no_edit,'String');
+        tmpVal = deblank(get(street_no_edit,'String'));
         if ~strcmp(tmpVal,'St. #')
             data.street_no(data.idx,1:length(tmpVal)) = tmpVal;  
         else % user didn't enter compulsory value
@@ -1544,7 +1544,7 @@ features_callback(features_tab,0);
         end
         
         % store street (as chars)
-        tmpVal = get(street_edit,'String');
+        tmpVal = deblank(get(street_edit,'String'));
         if ~strcmp(tmpVal,'Street')
             data.street(data.idx,1:length(tmpVal)) = tmpVal;            
         else % user didn't enter compulsory value
@@ -1922,7 +1922,7 @@ features_callback(features_tab,0);
         data.shed(data.idx) = int8(get(shed_check,'Value'));
 
         % store shed descriptions (as chars)
-        tmpVal = get(shed_edit,'String');
+        tmpVal = deblank(get(shed_edit,'String'));
         if ~strcmp(tmpVal,'')
             data.shed_types(data.idx,1:length(tmpVal)) = tmpVal;
         end
@@ -1944,71 +1944,120 @@ features_callback(features_tab,0);
         tmpVal = get(granny_flat_s_popup,'String');
         tmpVal = tmpVal{get(granny_flat_s_popup,'Value')};
         data.granny_flat_s(data.idx) = str2num(['int8(' tmpVal ')']);
-        
+                
         % store reno ideas (as chars)
-        tmpVal = get(ideas_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.idea_key(data.ideas_idx) = data.idx;
-            data.idea_notes(data.ideas_idx,1:length(tmpVal)) = tmpVal;
-            data.ideas_idx = data.ideas_idx + 1;
+        tmpVal = deblank(get(ideas_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.idea_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.idea_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.idea_key(data.ideas_idx) = data.idx;
+                data.idea_notes(data.ideas_idx,1:length(tmpVal)) = tmpVal;
+                data.ideas_idx = data.ideas_idx + 1;
+            end
         end
         
         % store general comments (as chars)
-        tmpVal = get(general_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.general_key(data.general_idx) = data.idx;
-            data.general_notes(data.general_idx,1:length(tmpVal)) = tmpVal;
-            data.general_idx = data.general_idx + 1;
+        tmpVal = deblank(get(general_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.general_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.general_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.general_key(data.general_idx) = data.idx;
+                data.general_notes(data.general_idx,1:length(tmpVal)) = tmpVal;
+                data.general_idx = data.general_idx + 1;
+            end
         end
         
         % store suburb notes (as chars)
-        tmpVal = get(suburb_comment_edit,'String');
-        if ~strcmp(tmpVal,'')
-        data.suburb_key(data.suburb_idx) = data.idx;
-        data.suburb_notes(data.suburb_idx,1:length(tmpVal)) = tmpVal;
-        data.suburb_idx = data.suburb_idx + 1;
+        tmpVal = deblank(get(suburb_comment_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.suburb_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.suburb_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.suburb_key(data.suburb_idx) = data.idx;
+                data.suburb_notes(data.suburb_idx,1:length(tmpVal)) = tmpVal;
+                data.suburb_idx = data.suburb_idx + 1;
+            end
         end
         
         % store street notes (as chars)
-        tmpVal = get(street_comment_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.street_key(data.street_idx) = data.idx;
-            data.street_notes(data.street_idx,1:length(tmpVal)) = tmpVal;
-            data.street_idx = data.street_idx + 1;
+        tmpVal = deblank(get(street_comment_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.street_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.street_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.street_key(data.street_idx) = data.idx;
+                data.street_notes(data.street_idx,1:length(tmpVal)) = tmpVal;
+                data.street_idx = data.street_idx + 1;
+            end
         end
         
         % store local neighbourhood notes (as chars)
-        tmpVal = get(local_comment_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.local_key(data.local_idx) = data.idx;
-            data.local_notes(data.local_idx,1:length(tmpVal)) = tmpVal;
-            data.local_idx = data.local_idx + 1;
+        tmpVal = deblank(get(local_comment_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.local_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.local_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.local_key(data.local_idx) = data.idx;
+                data.local_notes(data.local_idx,1:length(tmpVal)) = tmpVal;
+                data.local_idx = data.local_idx + 1;
+            end
         end
         
         % store agent notes (as chars)
-        tmpVal = get(agent_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.agent_key(data.agent_idx) = data.idx;
-            data.agent_notes(data.agent_idx,1:length(tmpVal)) = tmpVal;
-            data.agent_idx = data.agent_idx + 1;
+        tmpVal = deblank(get(agent_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.agent_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.agent_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.agent_notes(data.agent_idx) = data.idx;
+                data.agent_notes(data.agent_idx,1:length(tmpVal)) = tmpVal;
+                data.agent_idx = data.agent_idx + 1;
+            end
         end
         
         % store buyer notes (as chars)
-        tmpVal = get(buyers_edit,'String');
-        if ~strcmp(tmpVal,'')
-            data.buyer_key(data.buyer_idx) = data.idx;
-            data.buyer_notes(data.buyer_idx,1:length(tmpVal)) = tmpVal;
-            data.buyer_idx = data.buyer_idx + 1;
+        tmpVal = deblank(get(buyers_edit,'String'));                
+        % check if user previously entered comment (only possible in
+        % editing)
+        tmpIndexed = (data.buyer_key == load_idx);
+        if sum(tmpIndexed) == 1 % yes, overwrite previous comment
+            data.buyer_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
+        else %no, add to end if comment exists
+            if ~strcmp(tmpVal,'')
+                data.buyer_key(data.buyer_idx) = data.idx;
+                data.buyer_notes(data.buyer_idx,1:length(tmpVal)) = tmpVal;
+                data.buyer_idx = data.buyer_idx + 1;
+            end
         end
         
         % store old listing price (as uint16)
         tmpVal = get(list_price_old_edit,'String');
         if ~strcmp(tmpVal,'')
-            data.list_price_old(data.idx) = str2num(['uint16(' tmpVal ')']);
+            data.list_price_old(data.idx) = str2num(['uint32(' tmpVal ')']);
         end
         
         % store old listing date (as chars)
-        tmpVal = get(list_date_old_edit,'String');
+        tmpVal = deblank(get(list_date_old_edit,'String'));
         if ~strcmp(tmpVal,'')
             data.list_date_old(data.idx,1:length(tmpVal)) = tmpVal;
         end
@@ -2018,7 +2067,7 @@ features_callback(features_tab,0);
         if strcmpi(get(list_agent_old_edit,'Visible'),'on')
 %          implies that user intends to add agent
 %           check that not empty string
-            new_agent = get(list_agent_old_edit,'string');
+            new_agent = deblank(get(list_agent_old_edit,'string'));
             if strcmp(new_agent,'') 
                 errordlg('Attempted to add old agent as empty string',...
                     'Agent Must Have a Name');
@@ -2044,13 +2093,13 @@ features_callback(features_tab,0);
         end  
 
         % store current listing price (as uint16)
-        tmpVal = get(list_price_curr_edit,'String');
+        tmpVal = deblank(get(list_price_curr_edit,'String'));
         if ~strcmp(tmpVal,'')
-            data.list_price_curr(data.idx) = str2num(['uint16(' tmpVal ')']);
+            data.list_price_curr(data.idx) = str2num(['uint32(' tmpVal ')']);
         end
         
         % store current listing date (as chars)
-        tmpVal = get(list_date_curr_edit,'String');
+        tmpVal = deblank(get(list_date_curr_edit,'String'));
         if ~strcmp(tmpVal,'')
             data.list_date_curr(data.idx,1:length(tmpVal)) = tmpVal;
         end
@@ -2061,7 +2110,7 @@ features_callback(features_tab,0);
         if strcmpi(get(list_agent_curr_edit,'Visible'),'on')
 %          implies that user intends to add agent
 %           check that not empty string
-            new_agent = get(list_agent_curr_edit,'string');
+            new_agent = deblank(get(list_agent_curr_edit,'string'));
             if strcmp(new_agent,'') 
                 errordlg('Attempted to add current agent as empty string',...
                     'Agent Must Have a Name');
@@ -2087,13 +2136,13 @@ features_callback(features_tab,0);
         end             
         
         % store sold price (as uint16)
-        tmpVal = get(sold_price_edit,'String');
+        tmpVal = deblank(get(sold_price_edit,'String'));
         if ~strcmp(tmpVal,'')
-            data.sold_price(data.idx) = str2num(['uint16(' tmpVal ')']);
+            data.sold_price(data.idx) = str2num(['uint32(' tmpVal ')']);
         end
         
         % store sold date (as chars)
-        tmpVal = get(sold_date_edit,'String');
+        tmpVal = deblank(get(sold_date_edit,'String'));
         if ~strcmp(tmpVal,'')
             data.sold_date(data.idx,1:length(tmpVal)) = tmpVal;
         end
@@ -2204,13 +2253,13 @@ features_callback(features_tab,0);
             data.granny_flat_d = [data.granny_flat_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.granny_flat_s = [data.granny_flat_s ;zeros(DATA_INCREMENT,1,'int8')];
             % sales
-            data.list_price_old = [data.list_price_old ; zeros(DATA_INCREMENT,1,'uint16')];
+            data.list_price_old = [data.list_price_old ; zeros(DATA_INCREMENT,1,'uint32')];
             data.list_date_old = [data.list_date_old; repmat(' ',DATA_INCREMENT,SSTR)];
             data.list_agent_old = [data.list_agent_old; repmat(' ',DATA_INCREMENT,SSTR)];
-            data.list_price_curr = [data.list_price_curr ; zeros(DATA_INCREMENT,1,'uint16')];
+            data.list_price_curr = [data.list_price_curr ; zeros(DATA_INCREMENT,1,'uint32')];
             data.list_date_curr = [data.list_date_curr; repmat(' ',DATA_INCREMENT,SSTR)];
             data.list_agent_curr = [data.list_agent_curr; repmat(' ',DATA_INCREMENT,SSTR)];
-            data.sold_price = [data.sold_price ; zeros(DATA_INCREMENT,1,'uint16')];
+            data.sold_price = [data.sold_price ; zeros(DATA_INCREMENT,1,'uint32')];
             data.sold_date = [data.sold_date; repmat(' ',DATA_INCREMENT,SSTR)];
             
             
