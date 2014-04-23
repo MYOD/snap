@@ -765,11 +765,11 @@ back_yard_s_popup = uicontrol('parent',features_panel,'Style','popup','Units','n
 TMP_X=TMP_X+X_GAP+NUM_W;
 pergola_check = uicontrol('parent',features_panel,'Style','checkbox','Units','normalized',...
     'String','Pergola','Position',...
-    [TMP_X,LINE_Y,STXT_W,POPUP_H]);
+    [TMP_X,LINE_Y,STXT_W,POPUP_H],'callback',{@verandah_callback});
 TMP_X=TMP_X+X_GAP+STXT_W;
 verandah_check = uicontrol('parent',features_panel,'Style','checkbox','Units','normalized',...
     'String','Verandah','Position',...
-    [TMP_X,LINE_Y,TXT_W,POPUP_H]);
+    [TMP_X,LINE_Y,TXT_W,POPUP_H],'callback',{@verandah_callback});
 TMP_X=TMP_X+X_GAP+TXT_W;
 verandah_c_txt = uicontrol('parent',features_panel,'Style','text','Units','normalized',...
     'String','C','Position', [TMP_X,LINE_Y,LETTER_W,TXT_H]);
@@ -792,7 +792,7 @@ TMP_X = X_GAP+TXT_W;
 LINE_Y=LINE_Y - POPUP_H - Y_GAP/2;
 grass_check = uicontrol('parent',features_panel,'Style','checkbox','Units','normalized',...
     'String','Grass','Position',...
-    [TMP_X,LINE_Y,STXT_W,POPUP_H]);
+    [TMP_X,LINE_Y,STXT_W,POPUP_H],'Callback',{@grass_callback});
 TMP_X=TMP_X+X_GAP+STXT_W;
 grass_c_txt = uicontrol('parent',features_panel,'Style','text','Units','normalized',...
     'String','C','Position', [TMP_X,LINE_Y,LETTER_W,TXT_H]);
@@ -818,8 +818,9 @@ LINE_Y=LINE_Y - POPUP_H - Y_GAP;
 of_txt = uicontrol('parent',features_panel,'Style','text','String','Other Features:',...
     'Units','normalized','Position',[TMP_X,LINE_Y,TXT_W,TXT_H]);
 TMP_X=TMP_X+X_GAP+TXT_W;
-swim_check = uicontrol('parent',features_panel,'Style','checkbox','String','Swimming Pool',...
-    'Units','normalized','Position',[TMP_X,LINE_Y,TXT_W+0.01,TXT_H]);
+swim_check = uicontrol('parent',features_panel,'Style','checkbox',...
+    'String','Swimming Pool','Units','normalized',...
+    'Position',[TMP_X,LINE_Y,TXT_W+0.01,TXT_H],'Callback',{@swim_callback});
 TMP_X=TMP_X+X_GAP+TXT_W+0.01;
 swim_c_txt = uicontrol('parent',features_panel,'Style','text','Units','normalized',...
     'String','C','Position', [TMP_X,LINE_Y,LETTER_W,TXT_H]);
@@ -841,7 +842,7 @@ swim_s_popup = uicontrol('parent',features_panel,'Style','popup','Units','normal
 TMP_X=TMP_X+X_GAP+NUM_W;
 shed_check = uicontrol('parent',features_panel,'Style','checkbox','Units','normalized',...
     'String','Sheds','Position',...
-    [TMP_X,LINE_Y,STXT_W,POPUP_H]);
+    [TMP_X,LINE_Y,STXT_W,POPUP_H],'Callback',{@shed_callback});
 TMP_X=TMP_X+X_GAP+STXT_W;
 shed_edit = uicontrol('parent',features_panel,'Style','edit',...
     'Units','normalized','String','','horizontalAlignment','left',...
@@ -851,7 +852,7 @@ TMP_X = X_GAP+TXT_W;
 LINE_Y=LINE_Y - POPUP_H - Y_GAP/2;
 granny_flat_check = uicontrol('parent',features_panel,'Style','checkbox','Units','normalized',...
     'String','Granny Flat','Position',...
-    [TMP_X,LINE_Y,TXT_W,POPUP_H]);
+    [TMP_X,LINE_Y,TXT_W,POPUP_H],'callback',{@granny_flat_callback});
 TMP_X=TMP_X+X_GAP+TXT_W;
 granny_flat_c_txt = uicontrol('parent',features_panel,'Style','text','Units','normalized',...
     'String','C','Position', [TMP_X,LINE_Y,LETTER_W,TXT_H]);
@@ -1543,11 +1544,20 @@ end
 % Move the GUI to the center of the screen.
 movegui(h_fig,'center')
 
+% By default, start on the features tab
+features_callback(features_tab,0);
+
+% Call the check callbacks
+verandah_callback(verandah_check,0);
+grass_callback(grass_check,0);
+swim_callback(swim_check,0);
+shed_callback(shed_check,0);
+granny_flat_callback(granny_flat_check,0);
+
 % Make the GUI visible.
 set(h_fig,'Visible','on');
 
-% By defaults start on the features tab
-features_callback(features_tab,0);
+
 
 %---------------------------------------------------------------------
     %  Callbacks for MYGUI
@@ -2660,6 +2670,82 @@ features_callback(features_tab,0);
             set(agency_curr_edit,'Visible','off');
         end
             
+    end
+
+%   user hit pergola/verandah checkbox
+    function verandah_callback(source,eventdata)
+        
+        % if at least one selected enable popup boxes
+        if get(verandah_check,'Value') || get(pergola_check,'Value')
+            set(verandah_c_popup,'enable','on');
+            set(verandah_d_popup,'enable','on');
+            set(verandah_s_popup,'enable','on');
+        else %disable
+            set(verandah_c_popup,'enable','off');
+            set(verandah_d_popup,'enable','off');
+            set(verandah_s_popup,'enable','off');
+        end 
+           
+    end
+
+    %   user hit grass checkbox
+    function grass_callback(source,eventdata)
+        
+        % if selected enable popup boxes
+        if get(grass_check,'Value')
+            set(grass_c_popup,'enable','on');
+            set(grass_d_popup,'enable','on');
+            set(grass_s_popup,'enable','on');
+        else %disable
+            set(grass_c_popup,'enable','off');
+            set(grass_d_popup,'enable','off');
+            set(grass_s_popup,'enable','off');
+        end 
+           
+    end
+
+    %   user hit swimming pool checkbox
+    function swim_callback(source,eventdata)
+        
+        % if selected enable popup boxes
+        if get(swim_check,'Value')
+            set(swim_c_popup,'enable','on');
+            set(swim_d_popup,'enable','on');
+            set(swim_s_popup,'enable','on');
+        else %disable
+            set(swim_c_popup,'enable','off');
+            set(swim_d_popup,'enable','off');
+            set(swim_s_popup,'enable','off');
+        end 
+           
+    end
+
+    %   user hit sheds checkbox
+    function shed_callback(source,eventdata)
+        
+        % if selected enable shed edit box
+        if get(shed_check,'Value')
+            set(shed_edit,'enable','on');
+        else %disable
+            set(shed_edit,'enable','off');
+        end 
+           
+    end
+
+    %   user hit granny_flat checkbox
+    function granny_flat_callback(source,eventdata)
+        
+        % if selected enable popup boxes
+        if get(granny_flat_check,'Value')
+            set(granny_flat_c_popup,'enable','on');
+            set(granny_flat_d_popup,'enable','on');
+            set(granny_flat_s_popup,'enable','on');
+        else %disable
+            set(granny_flat_c_popup,'enable','off');
+            set(granny_flat_d_popup,'enable','off');
+            set(granny_flat_s_popup,'enable','off');
+        end 
+           
     end
 
 %---------------------------------------------------------------------
