@@ -92,9 +92,8 @@ set(h_fig,'Visible','on');
         tmp = (1:size(data.suburb,1));
         suburb_key = tmp(suburb_idx);
         clear tmp;
-    
-        
-        % addresses
+            
+        % display addresses
         unit_nos = data.unit_no(suburb_idx,:);
         street_nos = data.street_no(suburb_idx,:);
         streets = data.street(suburb_idx,:);
@@ -108,6 +107,10 @@ set(h_fig,'Visible','on');
             deblank(street_nos) repmat(' ',size(streets,1),1) ...
             deblank(streets) repmat(' ',size(streets,1),1) deblank(types)];
         set(address_list,'value',1,'string', addresses);
+        
+        %key needs to be re-arranged accordingly
+        suburb_key = suburb_key(order);
+        
     end
 
 %   user hit OK button

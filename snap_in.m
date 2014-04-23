@@ -1554,6 +1554,10 @@ swim_callback(swim_check,0);
 shed_callback(shed_check,0);
 granny_flat_callback(granny_flat_check,0);
 
+% improve tab order
+% uistack(features_tab,'down',2);
+
+
 % Make the GUI visible.
 set(h_fig,'Visible','on');
 
@@ -1590,6 +1594,9 @@ set(h_fig,'Visible','on');
         set(comments_panel,'visible','on');
         set(sales_panel,'visible','off');
         
+        % put focus on first component
+        uicontrol(ideas_edit);
+        
     end
 
 %   user selected the sales tab
@@ -1604,6 +1611,9 @@ set(h_fig,'Visible','on');
         set(features_panel,'visible','off');
         set(comments_panel,'visible','off');
         set(sales_panel,'visible','on');
+        
+        % put focus on first component
+        uicontrol(low_list_price_old_edit);
         
     end
 
