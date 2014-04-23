@@ -98,9 +98,15 @@ set(h_fig,'Visible','on');
         unit_nos = data.unit_no(suburb_idx,:);
         street_nos = data.street_no(suburb_idx,:);
         streets = data.street(suburb_idx,:);
+        types = data.st_type(suburb_idx,:);
+        %alphabetise by street name
+        [streets, order] = sortrows(streets);
+        street_nos = street_nos(order,:);
+        unit_nos = unit_nos(order,:);
+        types = types(order,:);
         addresses = [deblank(unit_nos) repmat('/',size(streets,1),1) ...
             deblank(street_nos) repmat(' ',size(streets,1),1) ...
-            deblank(streets)];
+            deblank(streets) repmat(' ',size(streets,1),1) deblank(types)];
         set(address_list,'value',1,'string', addresses);
     end
 

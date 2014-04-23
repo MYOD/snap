@@ -104,6 +104,7 @@ else
     data.offstreets = zeros(data.max,1,'int8');  
     data.parking_c = zeros(data.max,1,'int8');
     data.parking_d = zeros(data.max,1,'int8');
+    data.dual_access = zeros(data.max,1,'int8');
 %   columns - flooring
     data.tile = zeros(data.max,1,'int8');
     data.slate = zeros(data.max,1,'int8');
@@ -392,7 +393,7 @@ sales_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
 %  Construct the components of features panel
 
 % construction components
-LINE_Y=1- POPUP_H - Y_GAP;
+LINE_Y=1- POPUP_H - Y_GAP/2;
 % CMTS_Y=LINE_Y - COMMENT_H - 0.01;
 TMP_X = X_GAP;
 construction_txt = uicontrol('parent',features_panel,'Style','text','String','Construction:',...
@@ -518,6 +519,11 @@ parking_d_txt = uicontrol('parent',features_panel,'Style','text','Units','normal
 TMP_X=TMP_X+X_GAP+LETTER_W;
 parking_d_popup = uicontrol('parent',features_panel,'Style','popup','Units','normalized',...
     'String',RATINGS,'Position', [TMP_X,LINE_Y,NUM_W,POPUP_H]);
+TMP_X = 2*X_GAP + TXT_W;
+LINE_Y=LINE_Y - POPUP_H - Y_GAP/2;
+dual_access_check = uicontrol('parent',features_panel,'Style','checkbox',...
+    'Units','normalized','String','Dual-Access',...
+    'Position',[TMP_X,LINE_Y,TXT_W,TXT_H]);
 
 % flooring components
 TMP_X = X_GAP;
@@ -1225,6 +1231,7 @@ if load_idx ~= 0
     tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
     tmpAns = tmpCoded(tmpIndexed);
     set(parking_d_popup,'Value',tmpAns);
+    set(dual_access_check,'Value',data.dual_access(load_idx));
 %   flooring
     set(tile_check,'Value',data.tile(load_idx));
     set(slate_check,'Value',data.slate(load_idx));
@@ -1781,6 +1788,9 @@ features_callback(features_tab,0);
         tmpVal = get(parking_d_popup,'String');
         tmpVal = tmpVal{get(parking_d_popup,'Value')};
         data.parking_d(data.idx) = str2num(['int8(' tmpVal ')']);          
+
+        % store dual-access boolean (as int8)
+        data.dual_access(data.idx) = int8(get(dual_access_check,'Value'));
         
         % store tile boolean (as int8)
         data.tile(data.idx) = int8(get(tile_check,'Value'));
@@ -2364,6 +2374,7 @@ features_callback(features_tab,0);
             data.offstreets = [data.offstreets; zeros(DATA_INCREMENT,1,'int8')];
             data.parking_c = [data.parking_c; zeros(DATA_INCREMENT,1,'int8')];
             data.parking_d = [data.parking_d; zeros(DATA_INCREMENT,1,'int8')];
+            data.dual_access = [data.dual_access; zeros(DATA_INCREMENT,1,'int8')];
             %   columns - flooring
             data.tile = [data.tile; zeros(DATA_INCREMENT,1,'int8')];
             data.slate = [data.slate; zeros(DATA_INCREMENT,1,'int8')];
