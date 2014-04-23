@@ -47,7 +47,8 @@ data_file = 'snap_data/snap_data.mat';
 if exist(data_file,'file')
     load(data_file,'data');
 else
-    errordlg([data_file 'not found!!'],[data_file 'Not Found!!']);
+    errordlg([data_file ' not found!!'],[data_file 'Not Found!!']);
+    return;
 end
 
 % manually invoke the suburb_callback for first use
