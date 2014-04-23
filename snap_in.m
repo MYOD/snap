@@ -1230,6 +1230,7 @@ if load_idx ~= 0
     set(slate_check,'Value',data.slate(load_idx));
     set(floorboard_check,'Value',data.floorboard(load_idx));
     set(vinyl_check,'Value',data.vinyl(load_idx));
+    set(carpet_check,'Value',data.carpet(load_idx));
     tmpHaystack = get(flooring_c_popup,'String');
     tmpNeedle = int2str(data.flooring_c(load_idx));
     tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
@@ -1276,18 +1277,18 @@ if load_idx ~= 0
     tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
     tmpAns = tmpCoded(tmpIndexed);
     set(shower_popup,'Value',tmpAns);
+    tmpHaystack = get(toilet_popup,'String');
+    tmpNeedle = int2str(data.toilets(load_idx));
+    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
+    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
+    tmpAns = tmpCoded(tmpIndexed);
+    set(toilet_popup,'Value',tmpAns);    
     tmpHaystack = get(spa_popup,'String');
     tmpNeedle = int2str(data.spas(load_idx));
     tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
     tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
     tmpAns = tmpCoded(tmpIndexed);
     set(spa_popup,'Value',tmpAns);
-    tmpHaystack = get(toilet_popup,'String');
-    tmpNeedle = int2str(data.toilets(load_idx));
-    tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
-    tmpCoded = tmpIndexed.*(1:length(tmpIndexed))';
-    tmpAns = tmpCoded(tmpIndexed);
-    set(toilet_popup,'Value',tmpAns);
     tmpHaystack = get(bathroom_c_popup,'String');
     tmpNeedle = int2str(data.bathroom_c(load_idx));
     tmpIndexed = strncmp(tmpNeedle,tmpHaystack,length(tmpNeedle));
@@ -1842,6 +1843,11 @@ features_callback(features_tab,0);
         tmpVal = tmpVal{get(toilet_popup,'Value')};
         data.toilets(data.idx) = str2num(['int8(' tmpVal ')']);
         
+        % store number of spas (as int8)
+        tmpVal = get(spa_popup,'String');
+        tmpVal = tmpVal{get(spa_popup,'Value')};
+        data.spas(data.idx) = str2num(['int8(' tmpVal ')']);
+        
         % store bathroom C (as int8)
         tmpVal = get(bathroom_c_popup,'String');
         tmpVal = tmpVal{get(bathroom_c_popup,'Value')};
@@ -2103,7 +2109,7 @@ features_callback(features_tab,0);
             data.agent_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
         else %no, add to end if comment exists
             if ~strcmp(tmpVal,'')
-                data.agent_notes(data.agent_idx) = data.idx;
+                data.agent_key(data.agent_idx) = data.idx;
                 data.agent_notes(data.agent_idx,1:length(tmpVal)) = tmpVal;
                 data.agent_idx = data.agent_idx + 1;
             end
