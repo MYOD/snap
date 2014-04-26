@@ -56,7 +56,7 @@ else
     data.buyer_max = 50;
     
     data.idx = 1; %unique to each property
-    data.ideas_idx = 1;
+    data.idea_idx = 1;
     data.general_idx = 1;
     data.suburb_idx = 1;
     data.street_idx = 1;
@@ -75,8 +75,8 @@ else
     data.inspect_start = repmat(' ',data.max,XSSTR);
     data.inspect_end = repmat(' ',data.max,XSSTR);
 %   columns - key data
-    data.modern = zeros(data.max,1,'int8');
-    data.maisonette = zeros(data.max,1,'int8');
+    data.modern = false(data.max,1);
+    data.maisonette = false(data.max,1);
     data.built = zeros(data.max,1,'uint16');
     data.last_reno = zeros(data.max,1,'uint16');
     data.land_area = zeros(data.max,1,'uint16');
@@ -104,9 +104,9 @@ else
     data.offstreets = zeros(data.max,1,'int8');  
     data.parking_c = zeros(data.max,1,'int8');
     data.parking_d = zeros(data.max,1,'int8');
-    data.dual_access = zeros(data.max,1,'int8');
+    data.dual_access = false(data.max,1);
 %   columns - flooring
-    data.tile = zeros(data.max,1,'int8');
+    data.tile = false(data.max,1);
     data.slate = zeros(data.max,1,'int8');
     data.floorboard = zeros(data.max,1,'int8');
     data.vinyl = zeros(data.max,1,'int8');
@@ -127,7 +127,7 @@ else
     data.bathroom_c = zeros(data.max,1,'int8');
     data.bathroom_d = zeros(data.max,1,'int8');
     data.bathroom_s = zeros(data.max,1,'int8');
-    data.heatlamp = zeros(data.max,1,'int8');
+    data.heatlamp = false(data.max,1);
 %   columns - bedroom
     data.bedrooms = zeros(data.max,1,'int8');
     data.wirs = zeros(data.max,1,'int8');
@@ -146,8 +146,8 @@ else
     data.back_yard_c = zeros(data.max,1,'int8');
     data.back_yard_d = zeros(data.max,1,'int8');
     data.back_yard_s = zeros(data.max,1,'int8');
-    data.pergola = zeros(data.max,1,'int8');
-    data.verandah = zeros(data.max,1,'int8');
+    data.pergola = false(data.max,1);
+    data.verandah = false(data.max,1);
     data.verandah_c = zeros(data.max,1,'int8');
     data.verandah_d = zeros(data.max,1,'int8');
     data.verandah_s = zeros(data.max,1,'int8');
@@ -156,13 +156,13 @@ else
     data.grass_d = zeros(data.max,1,'int8');
     data.grass_s = zeros(data.max,1,'int8');
 %   columns - other features
-    data.swim = zeros(data.max,1,'int8');
+    data.swim = false(data.max,1);
     data.swim_c = zeros(data.max,1,'int8');
     data.swim_d = zeros(data.max,1,'int8');
     data.swim_s = zeros(data.max,1,'int8');
     data.shed = zeros(data.max,1,'int8');
     data.shed_types = repmat(' ',data.max,LSTR);
-    data.granny_flat = zeros(data.max,1,'int8');
+    data.granny_flat = false(data.max,1);
     data.granny_flat_c = zeros(data.max,1,'int8');
     data.granny_flat_d = zeros(data.max,1,'int8');
     data.granny_flat_s = zeros(data.max,1,'int8');
@@ -1683,16 +1683,16 @@ set(h_fig,'Visible','on');
             data.inspect_end(data.idx,1:length(tmpVal)) = tmpVal;
         end
         
-        % store modern boolean (as int8)
+        % store modern boolean (as logical)
         if ~get(yes_radio,'Value') && ~get(no_radio,'Value')
             errordlg('You must specify if modern or dated',...
                 'Specify Modern/Dated');
             return;
         end
-        data.modern(data.idx) = int8(get(yes_radio,'Value'));
+        data.modern(data.idx) = logical(get(yes_radio,'Value'));
         
-        % store maisonette boolean (as int8)
-        data.maisonette(data.idx) = int8(get(maisonette_check,'Value'));
+        % store maisonette boolean (as logical)
+        data.maisonette(data.idx) = logical(get(maisonette_check,'Value'));
         
         % store built year (as uint16)
         tmpVal = get(built_edit,'String');
@@ -1809,23 +1809,23 @@ set(h_fig,'Visible','on');
         tmpVal = tmpVal{get(parking_d_popup,'Value')};
         data.parking_d(data.idx) = str2num(['int8(' tmpVal ')']);          
 
-        % store dual-access boolean (as int8)
-        data.dual_access(data.idx) = int8(get(dual_access_check,'Value'));
+        % store dual-access boolean (as logical)
+        data.dual_access(data.idx) = logical(get(dual_access_check,'Value'));
         
-        % store tile boolean (as int8)
-        data.tile(data.idx) = int8(get(tile_check,'Value'));
+        % store tile boolean (as logical)
+        data.tile(data.idx) = logical(get(tile_check,'Value'));
         
-        % store slate boolean (as int8)
-        data.slate(data.idx) = int8(get(slate_check,'Value'));
+        % store slate boolean (as logical)
+        data.slate(data.idx) = logical(get(slate_check,'Value'));
         
-        % store floorboard boolean (as int8)
-        data.floorboard(data.idx) = int8(get(floorboard_check,'Value'));
+        % store floorboard boolean (as floorboard)
+        data.floorboard(data.idx) = logical(get(floorboard_check,'Value'));
         
-        % store vinyl boolean (as int8)
-        data.vinyl(data.idx) = int8(get(vinyl_check,'Value'));
+        % store vinyl boolean (as logical)
+        data.vinyl(data.idx) = logical(get(vinyl_check,'Value'));
         
-        % store carpet boolean (as int8)
-        data.carpet(data.idx) = int8(get(carpet_check,'Value'));
+        % store carpet boolean (as logical)
+        data.carpet(data.idx) = logical(get(carpet_check,'Value'));
         
         % store flooring C (as int8)
         tmpVal = get(flooring_c_popup,'String');
@@ -1893,8 +1893,8 @@ set(h_fig,'Visible','on');
         tmpVal = tmpVal{get(bathroom_s_popup,'Value')};
         data.bathroom_s(data.idx) = str2num(['int8(' tmpVal ')']);       
         
-        % store heatlamp boolean (as int8)
-        data.heatlamp(data.idx) = int8(get(heatlamp_check,'Value'));
+        % store heatlamp boolean (as logical)
+        data.heatlamp(data.idx) = logical(get(heatlamp_check,'Value'));
         
         % store number of bedrooms (as int8)
         tmpVal = get(bedroom_popup,'String');
@@ -1971,11 +1971,11 @@ set(h_fig,'Visible','on');
         tmpVal = tmpVal{get(back_yard_s_popup,'Value')};
         data.back_yard_s(data.idx) = str2num(['int8(' tmpVal ')']); 
         
-        % store pergola boolean (as int8)
-        data.pergola(data.idx) = int8(get(pergola_check,'Value'));
+        % store pergola boolean (as logical)
+        data.pergola(data.idx) = logical(get(pergola_check,'Value'));
 
-        % store verandah boolean (as int8)
-        data.verandah(data.idx) = int8(get(verandah_check,'Value'));
+        % store verandah boolean (as logical)
+        data.verandah(data.idx) = logical(get(verandah_check,'Value'));
         
         % store verandah C (as int8)
         tmpVal = get(verandah_c_popup,'String');
@@ -2010,8 +2010,8 @@ set(h_fig,'Visible','on');
         tmpVal = tmpVal{get(grass_s_popup,'Value')};
         data.grass_s(data.idx) = str2num(['int8(' tmpVal ')']); 
         
-        % store swimming pool boolean (as int8)
-        data.swim(data.idx) = int8(get(swim_check,'Value'));
+        % store swimming pool boolean (as logical)
+        data.swim(data.idx) = logical(get(swim_check,'Value'));
         
         % store swimming pool C (as int8)
         tmpVal = get(swim_c_popup,'String');
@@ -2028,8 +2028,8 @@ set(h_fig,'Visible','on');
         tmpVal = tmpVal{get(swim_s_popup,'Value')};
         data.swim_s(data.idx) = str2num(['int8(' tmpVal ')']); 
         
-        % store shed boolean (as int8)
-        data.shed(data.idx) = int8(get(shed_check,'Value'));
+        % store shed boolean (as logical)
+        data.shed(data.idx) = logical(get(shed_check,'Value'));
 
         % store shed descriptions (as chars)
         tmpVal = deblank(get(shed_edit,'String'));
@@ -2037,8 +2037,8 @@ set(h_fig,'Visible','on');
             data.shed_types(data.idx,1:length(tmpVal)) = tmpVal;
         end
         
-        % store granny flat boolean (as int8)
-        data.granny_flat(data.idx) = int8(get(granny_flat_check,'Value'));
+        % store granny flat boolean (as logical)
+        data.granny_flat(data.idx) = logical(get(granny_flat_check,'Value'));
         
         % store granny flat C (as int8)
         tmpVal = get(granny_flat_c_popup,'String');
@@ -2064,9 +2064,9 @@ set(h_fig,'Visible','on');
             data.idea_notes(tmpIndexed,1:length(tmpVal)) = tmpVal;
         else %no, add to end if comment exists
             if ~strcmp(tmpVal,'')
-                data.idea_key(data.ideas_idx) = data.idx;
-                data.idea_notes(data.ideas_idx,1:length(tmpVal)) = tmpVal;
-                data.ideas_idx = data.ideas_idx + 1;
+                data.idea_key(data.idea_idx) = data.idx;
+                data.idea_notes(data.idea_idx,1:length(tmpVal)) = tmpVal;
+                data.idea_idx = data.idea_idx + 1;
             end
         end
         
@@ -2365,8 +2365,8 @@ set(h_fig,'Visible','on');
             data.inspect_start = [data.inspect_start; repmat(' ',DATA_INCREMENT,XSSTR)];
             data.inspect_end = [data.inspect_end; repmat(' ',DATA_INCREMENT,XSSTR)];
             % key data
-            data.modern = [data.modern ; zeros(DATA_INCREMENT,1,'int8')];
-            data.maisonette = [data.maisonette ; zeros(DATA_INCREMENT,1,'int8')];
+            data.modern = [data.modern ; false(DATA_INCREMENT,1)];
+            data.maisonette = [data.maisonette ; logical(DATA_INCREMENT,1)];
             data.built = [data.built ; zeros(DATA_INCREMENT,1,'uint16')];
             data.last_reno = [data.last_reno ; zeros(DATA_INCREMENT,1,'uint16')];
             data.land_area = [data.land_area ; zeros(DATA_INCREMENT,1,'uint16')];
@@ -2394,13 +2394,13 @@ set(h_fig,'Visible','on');
             data.offstreets = [data.offstreets; zeros(DATA_INCREMENT,1,'int8')];
             data.parking_c = [data.parking_c; zeros(DATA_INCREMENT,1,'int8')];
             data.parking_d = [data.parking_d; zeros(DATA_INCREMENT,1,'int8')];
-            data.dual_access = [data.dual_access; zeros(DATA_INCREMENT,1,'int8')];
+            data.dual_access = [data.dual_access; false(DATA_INCREMENT,1)];
             %   columns - flooring
-            data.tile = [data.tile; zeros(DATA_INCREMENT,1,'int8')];
-            data.slate = [data.slate; zeros(DATA_INCREMENT,1,'int8')];
-            data.floorboard = [data.floorboard; zeros(DATA_INCREMENT,1,'int8')];
-            data.vinyl = [data.vinyl; zeros(DATA_INCREMENT,1,'int8')];
-            data.carpet = [data.carpet ;zeros(DATA_INCREMENT,1,'int8')];
+            data.tile = [data.tile; false(DATA_INCREMENT,1)];
+            data.slate = [data.slate; false(DATA_INCREMENT,1)];
+            data.floorboard = [data.floorboard; false(DATA_INCREMENT,1)];
+            data.vinyl = [data.vinyl; false(DATA_INCREMENT,1)];
+            data.carpet = [data.carpet ;false(DATA_INCREMENT,1)];
             data.flooring_c = [data.flooring_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.flooring_d = [data.flooring_d ;zeros(DATA_INCREMENT,1,'int8')];
             %   columns - kitchen
@@ -2417,7 +2417,7 @@ set(h_fig,'Visible','on');
             data.bathroom_c = [data.bathroom_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.bathroom_d = [data.bathroom_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.bathroom_s = [data.bathroom_s ;zeros(DATA_INCREMENT,1,'int8')];
-            data.heatlamp = [data.heatlamp ;zeros(DATA_INCREMENT,1,'int8')];
+            data.heatlamp = [data.heatlamp ;false(DATA_INCREMENT,1)];
             %   columns - bedroom
             data.bedrooms = [data.bedrooms ;zeros(DATA_INCREMENT,1,'int8')];
             data.wirs = [data.wirs ;zeros(DATA_INCREMENT,1,'int8')];
@@ -2436,8 +2436,8 @@ set(h_fig,'Visible','on');
             data.back_yard_c = [data.back_yard_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.back_yard_d = [data.back_yard_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.back_yard_s = [data.back_yard_s ;zeros(DATA_INCREMENT,1,'int8')];
-            data.pergola = [data.pergola ;zeros(DATA_INCREMENT,1,'int8')];
-            data.verandah = [data.verandah ;zeros(DATA_INCREMENT,1,'int8')];
+            data.pergola = [data.pergola ;false(DATA_INCREMENT,1)];
+            data.verandah = [data.verandah ;false(DATA_INCREMENT,1)];
             data.verandah_c = [data.verandah_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.verandah_d = [data.verandah_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.verandah_s = [data.verandah_s ;zeros(DATA_INCREMENT,1,'int8')];
@@ -2446,13 +2446,13 @@ set(h_fig,'Visible','on');
             data.grass_d = [data.grass_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.grass_s = [data.grass_s ;zeros(DATA_INCREMENT,1,'int8')];
             %   columns - other features
-            data.swim = [data.swim ;zeros(DATA_INCREMENT,1,'int8')];
+            data.swim = [data.swim ;false(DATA_INCREMENT,1)];
             data.swim_c = [data.swim_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.swim_d = [data.swim_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.swim_s = [data.swim_s ;zeros(DATA_INCREMENT,1,'int8')];
-            data.shed = [data.shed ;zeros(DATA_INCREMENT,1,'int8')];
+            data.shed = [data.shed ;false(DATA_INCREMENT,1)];
             data.shed_types = [data.shed_types; repmat(' ',DATA_INCREMENT,LSTR)];
-            data.granny_flat = [data.granny_flat ;zeros(DATA_INCREMENT,1,'int8')];
+            data.granny_flat = [data.granny_flat ;false(DATA_INCREMENT,1)];
             data.granny_flat_c = [data.granny_flat_c ;zeros(DATA_INCREMENT,1,'int8')];
             data.granny_flat_d = [data.granny_flat_d ;zeros(DATA_INCREMENT,1,'int8')];
             data.granny_flat_s = [data.granny_flat_s ;zeros(DATA_INCREMENT,1,'int8')];
@@ -2478,7 +2478,7 @@ set(h_fig,'Visible','on');
             % increment the data_max limit
             data.max = data.max + DATA_INCREMENT;
         end
-        if data.ideas_idx == (data.idea_max + 1)
+        if data.idea_idx == (data.idea_max + 1)
             
             data.idea_key = [data.idea_key;...
                 zeros(NOTES_INCREMENT,1,'uint16')];

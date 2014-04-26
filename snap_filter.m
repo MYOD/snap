@@ -9,7 +9,7 @@ function snap_filter
 table_headings = {};
 table_datum = {};
 table_defaults = {'Street Number', 'Street Name','Street Type', 'Suburb',...
-                   'Sold Price', 'Sold Date'};
+    'Sold Price ($)', 'Sold Date'};
 % define constants
 % main figure dimensions
 Y_GAP = 0.02;
@@ -26,32 +26,64 @@ LARGE_TABLE = [X_GAP (INFO_H+2*Y_GAP) FULL_W (SMALL_TABLE(4)+ PANEL_H)];
 % main figure dimensions
 tY_GAP = 0.02;
 tX_GAP = 0.02;
-tLIST_W = 0.2;
+tLIST_W = 0.18;
 tFULL_H = (1 - 2*tY_GAP);
-tBUTTON_W = 0.16;
+tBUTTON_W = 0.12;
 tBUTTON_H = 0.18;
-
+tTXT_W = 0.08;
+tTXT_H = 0.18;
+% states
+DISPLAY_MODE = 2;
+FILTER_MODE = 0;
+IS_CHAR = 0;
+IS_NUM = 1;
+IS_LOGIC = 2;
 % colour constants
 BG_COLOUR = [0.9412, 0.9412, 0.912];
 LITE_COLOUR = [0.8, 0.8, 0.8];
-
-% standard string length
-STR = 20;
+% index constants
+V1 = 1;
+V2 = 2;
+DESC = 3;
+KEYWORD = 4;
+XLSTR = 200; % length of notes strings
+STR = 20; % standard string length
+HIGH_ROWS =6;
+ADDRESS_ROWS = 5;
+BUILD_ROWS = 7;
+FEATURES_ROWS=12;
+CONSTRUCTION_ROWS=2;
+ROOFING_ROWS=3;
+FRONT_YARD_ROWS=3;
+FRONT_FACADE_ROWS=3;
+PARKING_ROWS=7;
+FLOORING_ROWS=7;
+KITCHEN_ROWS=5;
+BATHROOM_ROWS=8;
+BEDROOM_ROWS=9;
+CLIMATE_ROWS=3;
+BACK_YARD_ROWS=12;
+OTHER_ROWS=10;
+INSPECTION_ROWS=3;
+SALES_ROWS=12;
+NOTES_ROWS=7;
 % string arrays
-HIGH_STRS = repmat(' ',6,STR); idx = 1;
+BOOLEAN_STRS = {'Is','Is Not'};
+NUMBERS_STRS = {'Below', 'Above', 'Between', 'Exactly'};
+HIGH_STRS = repmat(' ',HIGH_ROWS,STR); idx = 1;
 str='Address'; HIGH_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Build Stats'; HIGH_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Comments'; HIGH_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Features'; HIGH_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Inspection'; HIGH_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Sales'; HIGH_STRS(idx,1:length(str)) = str;
-ADDRESS_STRS = repmat(' ',5,STR); idx = 1;
+ADDRESS_STRS = repmat(' ',ADDRESS_ROWS,STR); idx = 1;
 str='Unit Number'; ADDRESS_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Street Number'; ADDRESS_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Street Name'; ADDRESS_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Street Type'; ADDRESS_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Suburb'; ADDRESS_STRS(idx,1:length(str)) = str;
-BUILD_STRS = repmat(' ',7,STR); idx = 1;
+BUILD_STRS = repmat(' ',BUILD_ROWS,STR); idx = 1;
 str='Year Built'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Year Renovated'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Modern'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -59,7 +91,7 @@ str='Maisonnette'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Land Area'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Living Area'; BUILD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Frontage'; BUILD_STRS(idx,1:length(str)) = str;
-FEATURES_STRS = repmat(' ',12,STR); idx = 1;
+FEATURES_STRS = repmat(' ',FEATURES_ROWS,STR); idx = 1;
 str='Construction'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Roofing'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Front Facade'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -72,22 +104,22 @@ str='Bedroom'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Climate Control'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Back Yard'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Other'; FEATURES_STRS(idx,1:length(str)) = str;
-CONSTRUCTION_STRS = repmat(' ',2,STR); idx = 1;
+CONSTRUCTION_STRS = repmat(' ',CONSTRUCTION_ROWS,STR); idx = 1;
 str='Construction'; CONSTRUCTION_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Construction)'; CONSTRUCTION_STRS(idx,1:length(str)) = str;
-ROOFING_STRS = repmat(' ',3,STR); idx = 1;
+ROOFING_STRS = repmat(' ',ROOFING_ROWS,STR); idx = 1;
 str='Roofing'; ROOFING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Roofing)'; ROOFING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Roofing)'; ROOFING_STRS(idx,1:length(str)) = str;
-FRONT_YARD_STRS = repmat(' ',3,STR); idx = 1;
+FRONT_YARD_STRS = repmat(' ',FRONT_YARD_ROWS,STR); idx = 1;
 str='C (Front Yard)'; FRONT_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Front Yard)'; FRONT_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Front Yard)'; FRONT_YARD_STRS(idx,1:length(str)) = str;
-FRONT_FACADE_STRS = repmat(' ',3,STR); idx = 1;
+FRONT_FACADE_STRS = repmat(' ',FRONT_FACADE_ROWS,STR); idx = 1;
 str='Front Facade'; FRONT_FACADE_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Front Facade)'; FRONT_FACADE_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Front Facade)'; FRONT_FACADE_STRS(idx,1:length(str)) = str;
-PARKING_STRS = repmat(' ',7,STR); idx = 1;
+PARKING_STRS = repmat(' ',PARKING_ROWS,STR); idx = 1;
 str='# Garages'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Carports'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Secure'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -95,7 +127,7 @@ str='# Off-street'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Parking)'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Parking)'; PARKING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Dual-Access?'; PARKING_STRS(idx,1:length(str)) = str;
-FLOORING_STRS = repmat(' ',7,STR); idx = 1;
+FLOORING_STRS = repmat(' ',FLOORING_ROWS,STR); idx = 1;
 str='Tiles?'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Slates?'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Floorboards?'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -103,13 +135,13 @@ str='Vinyl?'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Carpet?'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Flooring)'; FLOORING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Flooring)'; FLOORING_STRS(idx,1:length(str)) = str;
-KITCHEN_STRS = repmat(' ',5,STR); idx = 1;
+KITCHEN_STRS = repmat(' ',KITCHEN_ROWS,STR); idx = 1;
 str='Open Living?'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Pantry?'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str;
-BATHROOM_STRS = repmat(' ',8,STR); idx = 1;
+BATHROOM_STRS = repmat(' ',BATHROOM_ROWS,STR); idx = 1;
 str='# Baths'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Showers'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Toilets'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -118,7 +150,7 @@ str='C (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Heatlamps?'; BATHROOM_STRS(idx,1:length(str)) = str;
-BEDROOM_STRS = repmat(' ',9,STR); idx = 1;
+BEDROOM_STRS = repmat(' ',BEDROOM_ROWS,STR); idx = 1;
 str='# Bedrooms'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# WIRs'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# BIRs'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -128,11 +160,11 @@ str='# BR Toilets'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Bedroom)'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Bedroom)'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Bedroom)'; BEDROOM_STRS(idx,1:length(str)) = str;
-CLIMATE_STRS = repmat(' ',3,STR); idx = 1;
+CLIMATE_STRS = repmat(' ',CLIMATE_ROWS,STR); idx = 1;
 str='Heating'; CLIMATE_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Cooling'; CLIMATE_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Coverage'; CLIMATE_STRS(idx,1:length(str)) = str;
-BACK_YARD_STRS = repmat(' ',12,STR); idx = 1;
+BACK_YARD_STRS = repmat(' ',BACK_YARD_ROWS,STR); idx = 1;
 str='C (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -145,7 +177,7 @@ str='Grass?'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Grass)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Grass)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Grass)'; BACK_YARD_STRS(idx,1:length(str)) = str;
-OTHER_STRS = repmat(' ',10,STR); idx = 1;
+OTHER_STRS = repmat(' ',OTHER_ROWS,STR); idx = 1;
 str='Swimming Pool?'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Swimming Pool)'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Swimming Pool)'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -156,11 +188,11 @@ str='Granny Flat?'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Granny Flat)'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Granny Flat)'; OTHER_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Granny Flat)'; OTHER_STRS(idx,1:length(str)) = str;
-INSPECTION_STRS = repmat(' ',3,STR); idx = 1;
+INSPECTION_STRS = repmat(' ',INSPECTION_ROWS,STR); idx = 1;
 str='Date (Inspection)'; INSPECTION_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Start (Inspection)'; INSPECTION_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='End (Inspection)'; INSPECTION_STRS(idx,1:length(str)) = str;
-SALES_STRS = repmat(' ',12,STR); idx = 1;
+SALES_STRS = repmat(' ',SALES_ROWS,STR); idx = 1;
 str='Old Ask Low ($)'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Old Ask High ($)'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Old Asking Date'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -173,7 +205,7 @@ str='Curr Agent'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Curr Agency'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Sold Price ($)'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Sold Date'; SALES_STRS(idx,1:length(str)) = str;
-NOTES_STRS = repmat(' ',7,STR); idx = 1;
+NOTES_STRS = repmat(' ',NOTES_ROWS,STR); idx = 1;
 str='Reno Ideas'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='General'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Suburb Notes'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -181,6 +213,126 @@ str='Street Notes'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Local Neighbourhood'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Agent Notes'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Buyer Types'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
+
+% construct arrays that maps lowest level descriptions to variables
+VAR_ROWS = ADDRESS_ROWS + BUILD_ROWS + CONSTRUCTION_ROWS + ROOFING_ROWS + ...
+    FRONT_YARD_ROWS + FRONT_FACADE_ROWS + PARKING_ROWS + FLOORING_ROWS + ...
+    KITCHEN_ROWS + BATHROOM_ROWS + BEDROOM_ROWS + CLIMATE_ROWS + ...
+    BACK_YARD_ROWS + OTHER_ROWS + INSPECTION_ROWS + SALES_ROWS + NOTES_ROWS;
+DESC_ARR = repmat(' ',VAR_ROWS,STR); % holds user friendly descriptions
+VAR_ARR = repmat(' ',VAR_ROWS,STR); % holds corresponding variable names
+DESC_ARR(:,:) = [ADDRESS_STRS; BUILD_STRS; CONSTRUCTION_STRS; ROOFING_STRS; ...
+    FRONT_YARD_STRS; FRONT_FACADE_STRS; PARKING_STRS; FLOORING_STRS; ...
+    KITCHEN_STRS; BATHROOM_STRS; BEDROOM_STRS; CLIMATE_STRS; BACK_YARD_STRS;...
+    OTHER_STRS; INSPECTION_STRS; SALES_STRS; NOTES_STRS];
+idx = 1;
+str='unit_no'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='street_no'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='street'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='st_type'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='suburb'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='built'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='last_reno'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='modern'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='maisonette'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='land_area'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='floor_area'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='frontage'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='construction'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='construction_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='roofing'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='roofing_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='roofing_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_yard_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_yard_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_yard_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_facade'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_facade_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='front_facade_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='garages'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='carports'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='secures'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='offstreets'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='parking_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='parking_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='dual_access'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='tile'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='slate'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='floorboard'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='vinyl'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='carpet'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='flooring_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='flooring_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='open_living'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='pantry'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='kitchen_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='kitchen_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='kitchen_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='baths'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='showers'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='toilets'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='spas'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bathroom_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bathroom_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bathroom_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='heatlamp'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bedrooms'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='wirs'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='birs'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='kids'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='ensuites'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='brts'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bedroom_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bedroom_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='bedroom_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='heating'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='cooling'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='coverage'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='back_yard_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='back_yard_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='back_yard_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='pergola'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='verandah'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='verandah_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='verandah_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='verandah_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='grass'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='grass_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='grass_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='grass_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='swim'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='swim_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='swim_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='swim_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='shed'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='shed_types'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='granny_flat'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='granny_flat_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='granny_flat_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='granny_flat_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='inspect_date'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='inspect_start'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='inspect_end'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='low_list_price_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='high_list_price_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='list_date_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='list_agent_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='agency_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='low_list_price_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='high_list_price_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='list_date_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='list_agent_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='agency_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='sold_price'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='sold_date'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='idea_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='general_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='suburb_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='street_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='local_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='agent_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
+str='buyer_'; VAR_ARR(idx,1:length(str)) = str;
+
 
 %---------------------------------------------------------------------
 %  Create and then hide the GUI as it is being constructed.
@@ -198,11 +350,11 @@ filter_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
     'Position',[tmp_x,LARGE_TABLE(4)+INFO_H+3*Y_GAP,TAB_W,TAB_H],...
     'Callback',{@filter_callback});
 tmp_x = tmp_x + TAB_W;
-sort_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
-    'String','Sort','Units','normalized',...
-    'Position',[tmp_x,LARGE_TABLE(4)+INFO_H+3*Y_GAP,TAB_W,TAB_H],...
-    'Callback',{@sort_callback});
-tmp_x = tmp_x + TAB_W;
+% sort_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
+%     'String','Sort','Units','normalized',...
+%     'Position',[tmp_x,LARGE_TABLE(4)+INFO_H+3*Y_GAP,TAB_W,TAB_H],...
+%     'Callback',{@sort_callback});
+% tmp_x = tmp_x + TAB_W;
 display_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
     'String','Display','Units','normalized',...
     'Position',[tmp_x,LARGE_TABLE(4)+INFO_H+3*Y_GAP,TAB_W,TAB_H],...
@@ -214,12 +366,12 @@ hide_tab = uicontrol('parent',h_fig,'Style','pushbutton',...
     'Callback',{@hide_callback});
 
 % top panel components
-filter_panel = uipanel('position',...
-    [X_GAP, SMALL_TABLE(2)+SMALL_TABLE(4)+Y_GAP, FULL_W, PANEL_H],...
-    'Units','normalized');
-sort_panel = uipanel('position',...
-    [X_GAP, SMALL_TABLE(2)+SMALL_TABLE(4)+Y_GAP, FULL_W, PANEL_H],...
-    'Units','normalized');
+% filter_panel = uipanel('position',...
+%     [X_GAP, SMALL_TABLE(2)+SMALL_TABLE(4)+Y_GAP, FULL_W, PANEL_H],...
+%     'Units','normalized');
+% sort_panel = uipanel('position',...
+%     [X_GAP, SMALL_TABLE(2)+SMALL_TABLE(4)+Y_GAP, FULL_W, PANEL_H],...
+%     'Units','normalized');
 display_panel = uipanel('position',...
     [X_GAP, SMALL_TABLE(2)+SMALL_TABLE(4)+Y_GAP, FULL_W, PANEL_H],...
     'Units','normalized');
@@ -260,24 +412,59 @@ med_list = uicontrol('parent',display_panel,'Style','listbox',...
 tmp_x = tmp_x + tX_GAP + tLIST_W;
 low_list = uicontrol('parent',display_panel,'Style','listbox',...
     'Units','normalized','Visible','off','Position', ...
-    [tmp_x tY_GAP tLIST_W tFULL_H],'min',0,'max',2);
+    [tmp_x tY_GAP tLIST_W tFULL_H],'min',0,'max',2,'Callback',...
+    {@low_callback});
+tmp_x_copy = tmp_x + tLIST_W + tX_GAP;
 
 % button components
 y_incr = (1 - 3*tBUTTON_H)/4; % space buttons equidistant vertically
 line_y = 3*y_incr + 2*tBUTTON_H;
-tmp_x = tmp_x + tX_GAP + tLIST_W;
+% tmp_x = tmp_x + tX_GAP + tLIST_W;
+tmp_x = 1 - tX_GAP - tBUTTON_W;
 add_button = uicontrol('parent',display_panel,'Style','pushbutton',...
-    'Units','normalized','String','Add/Remove','Position', ...
+    'Units','normalized','Position', ...
     [tmp_x line_y tBUTTON_W tBUTTON_H],'callback',{@add_callback});
 line_y = 2*y_incr + tBUTTON_H;
-none_button = uicontrol('parent',display_panel,'Style','pushbutton',...
-    'Units','normalized','String','Clear All','Position', ...
-    [tmp_x line_y tBUTTON_W tBUTTON_H],'callback',{@none_callback});
-line_y = y_incr;
 default_button = uicontrol('parent',display_panel,'Style','pushbutton',...
-    'Units','normalized','String','Show Defaults','Position', ...
+    'Units','normalized','Position', ...
     [tmp_x line_y tBUTTON_W tBUTTON_H],'callback',{@default_callback});
+line_y = y_incr;
+none_button = uicontrol('parent',display_panel,'Style','pushbutton',...
+    'Units','normalized','Position', ...
+    [tmp_x line_y tBUTTON_W tBUTTON_H],'callback',{@none_callback});
 
+
+
+%%%%%%%%--------------- filter part of display panel
+
+tmp_x = tmp_x_copy;
+line_y = 2*tY_GAP + 0.8*tFULL_H;
+filter_text = uicontrol('parent',display_panel,'Style','text','String',...
+    'Filter Type:',...
+    'Units','normalized','Position', [tmp_x line_y tTXT_W tTXT_H]);
+tmp_x = tmp_x + tTXT_W + tX_GAP/2;
+
+filter_popup = uicontrol('parent',display_panel,'Style','popup',...
+    'Units','normalized','Position', [tmp_x line_y 1.6*tTXT_W tTXT_H],...
+    'Callback',{@filt_popup_callback});
+
+tmp_x = tmp_x_copy;
+line_y = line_y - tTXT_H - tY_GAP/2;
+filter_from_edit = uicontrol('parent',display_panel,'Style','edit',...
+    'Units','normalized','Position', [tmp_x line_y tTXT_W tTXT_H]);
+tmp_x = tmp_x + tTXT_W + tX_GAP/2;
+
+filter_and = uicontrol('parent',display_panel,'Style','text','String','and',...
+    'Units','normalized','Position', [tmp_x line_y 0.4*tTXT_W tTXT_H]);
+tmp_x = tmp_x + 0.4*tTXT_W + tX_GAP/2;
+
+filter_to_edit = uicontrol('parent',display_panel,'Style','edit',...
+    'Units','normalized','Position', [tmp_x line_y tTXT_W tTXT_H]);
+
+tmp_x = tmp_x_copy;
+filters_list = uicontrol('parent',display_panel,'Style','listbox',...
+    'Units','normalized','String',{},'Position', ...
+    [tmp_x tY_GAP 1.2*tLIST_W 0.6*tFULL_H],'min',0,'max',2);
 
 
 %---------------------------------------------------------------------
@@ -309,11 +496,16 @@ else
     errordlg([data_file 'not found!!'],[data_file 'Not Found!!']);
 end
 
+% By default, have no filters
+keep_rows = true(data.idx-1,1);
+filter_hist = cell(0,4);
 % By default, start on filter tab
-display_callback(filter_tab,0);
+filter_callback(filter_tab,0);
 
 % display default table columns
+set(high_list,'userData',DISPLAY_MODE); %trick gui to think its in display mode
 default_callback(default_button,0);
+set(high_list,'userData',FILTER_MODE);
 
 % Move the GUI to the center of the screen.
 movegui(h_fig,'center')
@@ -337,59 +529,96 @@ set(h_fig,'Visible','on');
         
         %       make tab colour look 'selected'
         set(filter_tab,'backgroundColor',BG_COLOUR);
-        set(sort_tab,'backgroundColor',LITE_COLOUR);
+        %         set(sort_tab,'backgroundColor',LITE_COLOUR);
         set(display_tab,'backgroundColor',LITE_COLOUR);
         set(hide_tab,'backgroundColor',LITE_COLOUR);
         
-        %   make this panel the only visible
-        set(filter_panel,'visible','on');
-        set(sort_panel,'visible','off');
-        set(display_panel,'visible','off');
+        % indicate in FILTER state
+        set(high_list,'UserData',FILTER_MODE);
+        
+        % refresh display of high,med,low listboxes
+        set(high_list,'Value',1);
+        high_callback(high_list,0);
+        
+        % hide/show appropriate components
+        set(filter_text,'visible','on');
+        set(filters_list,'visible','on');
+        set(filter_popup,'visible','on');
+        set(default_button,'visible','on');
+        set(add_button','String','Add New Filter');
+        set(default_button,'String','Remove');
+        set(none_button,'String','Clear All');
         
         % minimise the table
         set(table,'position',SMALL_TABLE);
+        
+        %   make this panel the only visible
+        %         set(filter_panel,'visible','on');
+        %         set(sort_panel,'visible','off');
+        set(display_panel,'visible','on');
+        
         
     end
 
-%   user selected the sort tab
-    function sort_callback(source,eventdata)
-        
-        %       make tab colour look 'selected'
-        set(filter_tab,'backgroundColor',LITE_COLOUR);
-        set(sort_tab,'backgroundColor',BG_COLOUR);
-        set(display_tab,'backgroundColor',LITE_COLOUR);
-        set(hide_tab,'backgroundColor',LITE_COLOUR);
-        
-        %   make this panel the only visible
-        set(filter_panel,'visible','off');
-        set(sort_panel,'visible','on');
-        set(display_panel,'visible','off');
-        
-        % minimise the table
-        set(table,'position',SMALL_TABLE);
-        
-    end
+% %   user selected the sort tab
+%     function sort_callback(source,eventdata)
+%
+%         %       make tab colour look 'selected'
+%         set(filter_tab,'backgroundColor',LITE_COLOUR);
+%         %         set(sort_tab,'backgroundColor',BG_COLOUR);
+%         set(display_tab,'backgroundColor',LITE_COLOUR);
+%         set(hide_tab,'backgroundColor',LITE_COLOUR);
+%
+%         %   make this panel the only visible
+%         %         set(filter_panel,'visible','off');
+%         %         set(sort_panel,'visible','on');
+%         set(display_panel,'visible','on');
+%
+%         % remove filters list, add defaults button
+%         set(filters_list,'visible','off');
+%         set(default_button,'visible','on');
+%
+%         % minimise the table
+%         set(table,'position',SMALL_TABLE);
+%
+%     end
 
 %   user selected the display tab
     function display_callback(source,eventdata)
         
+        
+        % indicate desire that multiple selection be on
+        set(high_list,'UserData',DISPLAY_MODE);
+        
+        % reset values to 1
+        set(high_list,'Value',1);
+        high_callback(high_list,0);
+        
         %       make tab colour look 'selected'
         set(filter_tab,'backgroundColor',LITE_COLOUR);
-        set(sort_tab,'backgroundColor',LITE_COLOUR);
+        %         set(sort_tab,'backgroundColor',LITE_COLOUR);
         set(display_tab,'backgroundColor',BG_COLOUR);
         set(hide_tab,'backgroundColor',LITE_COLOUR);
         
         %   make this panel the only visible
-        set(filter_panel,'visible','off');
-        set(sort_panel,'visible','off');
+        %         set(filter_panel,'visible','off');
+        %         set(sort_panel,'visible','off');
         set(display_panel,'visible','on');
+        
+        % hide/show appropriate components
+        set(filter_text,'visible','off');
+        set(filters_list,'visible','off');
+        set(filter_popup,'visible','off');
+        set(filter_from_edit,'visible','off');
+        set(filter_and,'visible','off');
+        set(filter_to_edit,'visible','off');
+        set(default_button,'visible','on');
+        set(add_button','String','Add/Remove');
+        set(default_button,'String','Show Defaults');
+        set(none_button,'String','Clear All');
         
         % minimise the table
         set(table,'position',SMALL_TABLE);
-        
-        % by default, call the high and medium level list callback
-        high_callback(high_list,0);
-        med_callback(med_list,0);
         
     end
 
@@ -398,13 +627,13 @@ set(h_fig,'Visible','on');
         
         %       make tab colour look 'selected'
         set(filter_tab,'backgroundColor',LITE_COLOUR);
-        set(sort_tab,'backgroundColor',LITE_COLOUR);
+        %         set(sort_tab,'backgroundColor',LITE_COLOUR);
         set(display_tab,'backgroundColor',LITE_COLOUR);
         set(hide_tab,'backgroundColor',BG_COLOUR);
         
         %   hide the panels
-        set(filter_panel,'visible','off');
-        set(sort_panel,'visible','off');
+        %         set(filter_panel,'visible','off');
+        %         set(sort_panel,'visible','off');
         set(display_panel,'visible','off');
         
         %         expand the table
@@ -425,22 +654,22 @@ set(h_fig,'Visible','on');
         switch selection
             case 'Address'
                 set(med_list,'string',ADDRESS_STRS);
-                set(med_list,'max',2); %enable multiple selection
+                set(med_list,'max',get(high_list,'UserData')); %enable multiple selection
             case 'Build Stats'
                 set(med_list,'string',BUILD_STRS);
-                set(med_list,'max',2); %enable multiple selection
+                set(med_list,'max',get(high_list,'UserData')); %enable multiple selection
             case 'Comments'
                 set(med_list,'string',NOTES_STRS);
-                set(med_list,'max',2); %enable multiple selection
+                set(med_list,'max',get(high_list,'UserData')); %enable multiple selection
             case 'Features'
                 set(med_list,'string',FEATURES_STRS);
-                set(med_list,'max',0); %disable multiple selection
+                set(med_list,'max',0); %disable multiple selection always
             case 'Inspection'
                 set(med_list,'string',INSPECTION_STRS);
-                set(med_list,'max',2); %enable multiple selection
+                set(med_list,'max',get(high_list,'UserData')); %enable multiple selection
             case 'Sales'
                 set(med_list,'string',SALES_STRS);
-                set(med_list,'max',2); %enable multiple selectionn
+                set(med_list,'max',get(high_list,'UserData')); %enable multiple selectionn
         end
         
         % now that medium list has changed, better prompt it's callback
@@ -454,8 +683,6 @@ set(h_fig,'Visible','on');
         %         change options of low list
         %           do not allow a default value of 1
         selection = deblank(HIGH_STRS(get(high_list,'Value'),:));
-        
-        
         
         switch selection
             case 'Features' % only one requiring low level list
@@ -493,13 +720,58 @@ set(h_fig,'Visible','on');
                         set(low_list,'string',OTHER_STRS);
                 end
                 
+                % call low level callback
+                low_callback(low_list,0);
+                
                 % make sure list is visible
                 set(low_list,'Visible','on');
+                %                allow/disallow multiple selection at lowest level
+                set(low_list,'max',get(high_list,'UserData'));
                 
             otherwise
                 % make sure list is not visible
                 set(low_list,'Visible','off');
+                
+                if get(high_list,'UserData') == FILTER_MODE
+                    % in filter mode lowest level listbox selection
+                    % affects the filter edit box options
+                    
+                    % set filter components based on selection
+                    med_selection = get(med_list,'String');
+                    med_selection = med_selection(get(med_list,'Value'),:);
+                    prep_filters(med_selection);
+                    
+                    %                     idx = strcmp(DESC_ARR,cellstr(med_selection));
+                    %                     var = deblank(VAR_ARR(idx,:));
+                    %
+                    %                     if ~isfield(data,var) % implies comment column
+                    %
+                    %
+                    %                         %                     set(filter_from_edit,'visible','on');
+                    %                         %                     set(filter_and,'visible','on');
+                    %                         %                     set(filter_to_edit,'visible','on');
+                    %
+                    %                     end
+                end
         end
+        
+        
+    end
+
+%   user made a selection in the lowest level list
+    function low_callback(source, eventdata)
+        
+        if get(high_list,'UserData') == FILTER_MODE
+            % in filter mode lowest level listbox selection
+            % affects the filter edit box options
+            
+            % set filter components based on selection
+            low_selection = get(low_list,'String');
+            low_selection = low_selection(get(low_list,'Value'),:);
+            prep_filters(low_selection);
+            
+        end
+        
     end
 
 %   user pressed the add/remove button in display panel
@@ -518,8 +790,28 @@ set(h_fig,'Visible','on');
         %only care about selected strings
         strs = cellstr(strs(idx,:));
         
-        % add/remove selected elements
-        table_headings = setxor(table_headings,strs,'stable');
+        if get(high_list,'UserData') == FILTER_MODE
+            
+            % add filter command to list
+            disp_command(strs{1});
+            
+            % recover the key filter term
+            keyword = get(filter_popup,'String');
+            keyword = keyword{get(filter_popup,'Value')};
+            
+            % recover values from edit boxes
+            v1 = deblank(get(filter_from_edit,'String'));
+            v2 = deblank(get(filter_to_edit,'String'));
+            
+            % filter the indices
+            filter_rows(v1,v2,strs{1},keyword);
+            
+        else % DISPLAY MODE
+            
+            % add/remove selected elements
+            table_headings = setxor(table_headings,strs,'stable');
+            
+        end
         
         % update table
         update_table();
@@ -528,18 +820,84 @@ set(h_fig,'Visible','on');
 
 %   user pressed the clear all button in display panel
     function none_callback(source, eventdata)
-        table_headings = {};
         
+        if get(high_list,'UserData') == DISPLAY_MODE
+            % clear all menu items
+            table_headings = {};
+        else %filter mode
+            % clear all filters
+            keep_rows = true(data.idx-1,1);
+            set(filters_list,'String',{});
+            filter_hist = cell(0,4);
+        end
         update_table();
+        
     end
 
-%   user pressed the Show Defaults button in display panel
+%   user pressed the Show Defaults button
+%   in display mode this is 'Show Defaults'
+%   in filter mode this is 'Remove'
     function default_callback(source, eventdata)
-    
-        table_headings = table_defaults;
+        
+        if get(high_list,'UserData') == FILTER_MODE
+            
+            % recover selections from filter list
+            bad_idx = get(filters_list,'value');
+            
+            % remove selections from filter list
+            set(filters_list,'value',1); % as options will change
+            str = get(filters_list,'string');
+            str(bad_idx,:) = [];
+            set(filters_list,'string',str);
+            
+            % remove selections from filter structure
+            filter_hist(bad_idx,:) = [];
+            
+            % refilter
+            keep_rows = true(data.idx-1,1);
+            for i = 1:size(filter_hist,1)
+               
+                filter_rows(filter_hist{i,V1},filter_hist{i,V2},...
+                    filter_hist{i,DESC},filter_hist{i,KEYWORD});
+                
+            end
+            
+        else % DISPLAY MODE,
+            
+            table_headings = table_defaults;
+            
+        end
+        
         update_table();
         
     end
+
+% user made selection in the filter popup menu
+    function filt_popup_callback(source,eventdata)
+        
+        selection = get(source,'String');
+        selection = selection(get(source,'Value'));
+        
+        if strcmp(selection,'Between')
+            set(filter_from_edit,'visible','on');
+            set(filter_and,'visible','on');
+            set(filter_to_edit,'visible','on');
+            
+        elseif get(filter_popup,'UserData') ~= IS_LOGIC
+            
+            set(filter_from_edit,'visible','on');
+            set(filter_and,'visible','off');
+            set(filter_to_edit,'visible','off');
+            
+        else
+            
+            set(filter_from_edit,'visible','off');
+            set(filter_and,'visible','off');
+            set(filter_to_edit,'visible','off');
+        end
+        
+    end
+
 
 %---------------------------------------------------------------------
 %  Utility functions for snap_filter
@@ -548,582 +906,268 @@ set(h_fig,'Visible','on');
     function update_table()
         
         % initialise table data structure
-        table_datum = cell((data.idx -1),length(table_headings));
-        
-        % add address data
-        
-        idx = strcmp(table_headings,'Unit Number');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.unit_no(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Street Number');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.street_no(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Street Name');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.street(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Street Type');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.st_type(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Suburb');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.suburb(1:(data.idx-1),:));
-        end
-        
-        % add Build Stats data
-        
-        idx = strcmp(table_headings,'Year Built');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.built(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Year Renovated');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.last_reno(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Modern');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.modern(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Maisonette');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.maisonette(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Land Area');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.land_area(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Living Area');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.floor_area(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Frontage');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.frontage(1:(data.idx-1),:));
-        end
-        
-        % add construction data
-        
-        idx = strcmp(table_headings,'Construction');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.construction(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'C (Construction)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.construction_c(1:(data.idx-1),:));
-        end
-        
-        % add roofing data
-        
-        idx = strcmp(table_headings,'Roofing');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.roofing(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'C (Roofing)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.roofing_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Roofing)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.roofing_d(1:(data.idx-1),:));
-        end
-        
-        % add front yard data
-        
-        idx = strcmp(table_headings,'C (Front Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.front_yard_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Front Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.front_yard_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Front Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.front_yard_s(1:(data.idx-1),:));
-        end
-        
-        % add front facade data
-        
-        idx = strcmp(table_headings,'Front Facade');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.front_facade(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'C (Front Facade)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.front_facade_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Front Facade)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.front_facade_d(1:(data.idx-1),:));
-        end
-        
-        % add parking data
-        
-        idx = strcmp(table_headings,'# Garages');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.garages(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'# Carports');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.carports(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'# Secure');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.secures(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'# Off-street');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.offstreets(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'C (Parking)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.parking_c(1:(data.idx-1),:));
-        end
-        idx = strcmp(table_headings,'D (Parking)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.parking_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Dual-Access?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.dual_access(1:(data.idx-1),:)));
-        end
-
-        % add flooring data
-        
-        idx = strcmp(table_headings,'Tiles?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.tile(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Slates?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.slate(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Floorboards?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.floorboard(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Vinyl?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.vinyl(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Carpet?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.carpet(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Flooring)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.flooring_c(1:(data.idx-1),:));
-        end
-        idx = strcmp(table_headings,'D (Flooring)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.flooring_d(1:(data.idx-1),:));
-        end
-        
-        % add kitchen data
-        
-        idx = strcmp(table_headings,'Open Living?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.open_living(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Pantry?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.pantry(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Kitchen)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.kitchen_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Kitchen)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.kitchen_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Kitchen)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.kitchen_s(1:(data.idx-1),:));
-        end
-        
-%       add bathroom data
-        
-        idx = strcmp(table_headings,'# Baths');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.baths(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'# Showers');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.showers(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'# Toilets');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.toilets(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'# Spas');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.spas(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'C (Bathroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bathroom_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Bathroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bathroom_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Bathroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bathroom_s(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Heatlamps?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.heatlamp(1:(data.idx-1),:)));
-        end
-        
-        % get bedroom data
-        
-        idx = strcmp(table_headings,'# Bedrooms');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bedrooms(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'# WIRs');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.wirs(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'# BIRs');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.birs(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'# Kid Rooms');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.kids(1:(data.idx-1),:));
-        end
-
-        idx = strcmp(table_headings,'# Ensuites');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.ensuites(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'# BR Toilets');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.brts(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'C (Bedroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bedroom_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Bedroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bedroom_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Bedroom)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.bedroom_s(1:(data.idx-1),:));
-        end
-        
-        % add climate control data
-        
-        idx = strcmp(table_headings,'Heating');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.heating(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Cooling');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.cooling(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Coverage');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.coverage(1:(data.idx-1),:));
-        end
-        
-        % add back yard data
-        
-        idx = strcmp(table_headings,'C (Back Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.back_yard_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Back Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.back_yard_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Back Yard)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.back_yard_s(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Pergola?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.pergola(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Verandah?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.verandah(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Verandah)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.verandah_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Verandah)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.verandah_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Verandah)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.verandah_s(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Grass?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.grass(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Grass)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.grass_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Grass)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.grass_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Grass)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.grass_s(1:(data.idx-1),:));
-        end
-        
-        % add other feature data
-        
-        idx = strcmp(table_headings,'Swimming Pool?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.swim(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Swimming Pool)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.swim_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Swimming Pool)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.swim_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Swimming Pool)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.swim_s(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'Sheds?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.shed(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'Shed Types');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.shed_types(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Granny Flat?');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(logical(data.granny_flat(1:(data.idx-1),:)));
-        end
-        
-        idx = strcmp(table_headings,'C (Granny Flat)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.granny_flat_c(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'D (Granny Flat)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.granny_flat_d(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'S (Granny Flat)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.granny_flat_s(1:(data.idx-1),:));
-        end
-        
-        % add inspection data
-        
-        idx = strcmp(table_headings,'Date (Inspection)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.inspect_date(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Start (Inspection)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.inspect_start(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'End (Inspection)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.inspect_end(1:(data.idx-1),:));
-        end
-        
-        % add sales data
-        
-        idx = strcmp(table_headings,'Old Ask Low ($)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.low_list_price_old(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Old Ask High ($)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.high_list_price_old(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Old Asking Date');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.list_date_old(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Old Agent');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.list_agent_old(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Old Agency');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.agency_old(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Curr Ask Low ($)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.low_list_price_curr(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Curr Ask High ($)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.high_list_price_curr(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Curr Asking Date');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.list_date_curr(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Curr Agent');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.list_agent_curr(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Curr Agency');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.agency_curr(1:(data.idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Sold Price ($)');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = num2cell(data.sold_price(1:(data.idx-1),:));
-        end        
-        
-        idx = strcmp(table_headings,'Sold Date');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(:,idx) = cellstr(data.sold_date(1:(data.idx-1),:));
-        end        
-        
-        % add notes data
-        
-        idx = strcmp(table_headings,'Reno Ideas');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.idea_key(1:data.ideas_idx-1),idx) = ...
-                cellstr(data.idea_notes(1:(data.ideas_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'General');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.general_key(1:data.general_idx-1),idx) = ...
-                cellstr(data.general_notes(1:(data.general_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Suburb Notes');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.suburb_key(1:data.suburb_idx-1),idx) = ...
-                cellstr(data.suburb_notes(1:(data.suburb_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Street Notes');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.street_key(1:data.street_idx-1),idx) = ...
-                cellstr(data.street_notes(1:(data.street_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Local Neighbourhood');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.local_key(1:data.local_idx-1),idx) = ...
-                cellstr(data.local_notes(1:(data.local_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Agent Notes');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.agent_key(1:data.agent_idx-1),idx) = ...
-                cellstr(data.agent_notes(1:(data.agent_idx-1),:));
-        end
-        
-        idx = strcmp(table_headings,'Buyer Types');
-        if sum(idx) ~= 0 % belongs in the table
-            table_datum(data.buyer_key(1:data.buyer_idx-1),idx) = ...
-                cellstr(data.buyer_notes(1:(data.buyer_idx-1),:));
+        table_datum = cell(sum(keep_rows),length(table_headings));
+        
+        % for each column to be made
+        for i = 1:length(table_headings)
+            
+            % this is a column heading as a cellstr
+            idx = strcmp(DESC_ARR,table_headings(i));
+            var = deblank(VAR_ARR(idx,:));
+            
+            if ~isfield(data,var) % implies comment column
+                
+                % keep_rows encoded by its indices
+                keep_coded = (1:length(keep_rows))'.*keep_rows;
+                % remove zero elements: each element is a row in table,
+                % value is indice of data
+                keep_bare = keep_coded(keep_coded~=0);
+                % LHS: only assign to rows where comment exists
+                data_idx = eval(['ismember(keep_bare, data.' var 'key(1:data.' ...
+                    var 'idx - 1))']);
+                
+                % calculate the logical indices of RHS (w.r.t. notes)
+                notes_idx = eval(['ismember(data.' var 'key(1:data.' ...
+                    var 'idx - 1),keep_coded)']);
+                
+                table_datum(data_idx,i) = cellstr(...
+                    eval(['data.' var 'notes(notes_idx,:)']));
+                
+            elseif eval(['ischar(data.' var ')']) % implies strings column
+                
+                table_datum(:,i) = cellstr(eval(['data.' var '(keep_rows,:)']));
+                
+            else % numeric and logical column
+                
+                table_datum(:,i) = num2cell(eval(['data.' var '(keep_rows)']));
+                
+            end
+            
         end
         
         % make changes seen in the table
         set(table, 'ColumnName', table_headings); %headings
         set(table,'data',table_datum);
+        %
+    end
+
+%function: prep filters
+% description: uses the selection to decide state of filter
+%              components
+% inputs: selection - string should be a member of DESC_ARR
+%                       - selection needn't be deblanked
+    function prep_filters(selection)
+        
+        idx = strcmp(DESC_ARR,cellstr(selection));
+        var = deblank(VAR_ARR(idx,:)); % corresponding variable name
+        
+        % reset value of popup (as options will likely change
+        set(filter_popup,'value',1);
+        
+        if ~isfield(data,var) || eval(['ischar(data.' var ')']) % made of chars
+            set(filter_popup,'String',BOOLEAN_STRS);
+            set(filter_popup,'UserData',IS_CHAR);
+        elseif eval(['islogical(data.' var ')']) % logical
+            set(filter_popup,'String',BOOLEAN_STRS);
+            set(filter_popup,'UserData',IS_LOGIC);
+        elseif eval(['isnumeric(data.' var ')']) %numeric
+            set(filter_popup,'String',NUMBERS_STRS);
+            set(filter_popup,'UserData',IS_NUM);
+        else
+            errordlg('Unknown Type! Please tell Peter', 'Unknown Type');
+            return;
+        end
+        
+        
+        % invoke filter popup callback
+        filt_popup_callback(filter_popup,0);
         
     end
 
+% function: disp_command
+% description: will add a human readable line to the filter list
+%                  explaining purpose of filter
+% input: desc - string description from lowest level list
+    function disp_command(desc)
+        
+        % recover the key filter term
+        keyword = get(filter_popup,'String');
+        keyword = keyword{get(filter_popup,'Value')};
+        
+        % recover values from edit boxes
+        v1 = deblank(get(filter_from_edit,'String'));
+        v2 = deblank(get(filter_to_edit,'String'));
+        
+        if get(filter_popup,'UserData') == IS_LOGIC
+            
+            command = [keyword ' ' desc];
+            
+        else
+            
+            if strcmp(keyword,'Between')
+                command = [desc ' ' keyword ' ' v1 ' And ' v2];
+            else
+                command = [desc ' ' keyword ' ' v1];
+            end
+            
+        end
+        
+        % check if command exists
+        commands = get(filters_list,'String');
+        if sum(strcmpi(commands,command)) ~= 0
+            errordlg('Filter command already applied!',...
+                'Filter Command Already Exists');
+            return;
+        else
+            commands{length(commands)+1} = command;
+            set(filters_list,'String',commands);
+        end
+        
+        % add the command to the filter history
+        row = size(filter_hist,1) + 1;
+        filter_hist{row,V1} = v1;
+        filter_hist{row,V2} = v1;
+        filter_hist{row,DESC} = desc;
+        filter_hist{row,KEYWORD} = keyword;
+        
+    end
 
+% function: filter_rows
+% description: filters keep_rows which ultimately determines the data
+% input: v1 - user inputted string 'from' value
+%        v2 - user inputted string 'to' value
+%      desc - string of lowest level description
+%   keyword - command selected from filter_popup
+    function filter_rows(v1,v2,desc,keyword)
+        
+        % find correspoding variable
+        idx = strcmp(cellstr(desc),DESC_ARR);
+        var = deblank(VAR_ARR(idx,:));
+                
+        switch keyword
+            
+            % could be logical, char, or comment
+            case 'Is'
+                
+                if get(filter_popup,'UserData') == IS_LOGIC
+                    
+                    keep_rows = keep_rows & eval(['data.' var ...
+                        '(1:length(keep_rows));']);
+                    
+                elseif ~isfield(data,var) % is comment
+                    
+                    % NOTE: may want to bring in regexp() function to
+                    %       enable wildcards or could add a 'Contains'
+                    %       option to the users dropdown
+                    
+                    % matching indices w.r.t. notes
+                    matches = eval(['strcmpi(cellstr(v1),data.' var ...
+                        'notes(1:data.' var 'idx - 1,:))']);
+                    
+                    % matching indices w.r.t. snap data
+                    idx = eval(['data.' var 'key(matches)']);
+                    % convert this to logical indexing
+                    big_idx = ismember((1:length(keep_rows))',idx);
+                    keep_rows = keep_rows & big_idx;
+                    
+                    
+                else % is char
+                    
+                    keep_rows = keep_rows & ...
+                        eval(['strcmpi(cellstr(v1),data.' var ...
+                        '(1:length(keep_rows),:))']);
+                    
+                end
+                
+            case 'Is Not'
+                
+                
+                if get(filter_popup,'UserData') == IS_LOGIC
+                    
+                    keep_rows = keep_rows & ~eval(['data.' var ...
+                        '(1:length(keep_rows));']);
+                    
+                elseif ~isfield(data,var) % is comment
+                    
+                    % NOTE: may want to bring in regexp() function to
+                    %       enable wildcards or could add a 'Contains'
+                    %       option to the users dropdown
+                    
+                    % matching indices w.r.t. notes
+                    matches = eval(['strcmpi(cellstr(v1),data.' var ...
+                        'notes(1:data.' var 'idx - 1,:))']);
+                    
+                    % matching indices w.r.t. snap data
+                    idx = eval(['data.' var 'key(matches)']);
+                    % convert this to logical indexing
+                    big_idx = ismember((1:length(keep_rows))',idx);
+                    keep_rows = keep_rows & ~big_idx;
+                    
+                    
+                else % is char
+                    
+                    keep_rows = keep_rows & ...
+                        ~eval(['strcmpi(cellstr(v1),data.' var ...
+                        '(1:length(keep_rows),:))']);
+                    
+                end
+                
+                
+                % here and below apply solely to numeric data
+            case 'Below' % i.e. user wants var <= v1
+                keep_rows = keep_rows & eval(['data.' var ...
+                    '(1:length(keep_rows)) <= ' v1]);
+                
+            case 'Above' % i.e. user wants var >= v1
+                keep_rows = keep_rows & eval(['data.' var ...
+                    '(1:length(keep_rows)) >= ' v1]);
+                
+            case 'Between' % i.e. user wants var >= v1 and var <= v2
+                keep_rows = keep_rows & ...
+                    eval(['data.' var '(1:length(keep_rows)) >= '...
+                    v1 ' & data.' var '(1:length(keep_rows)) <= ' v2]);
+                
+            case 'Exactly' % i.e. user wants var == v1
+                keep_rows = keep_rows & eval(['data.' var ...
+                    '(1:length(keep_rows)) == ' v1]);
+                
+                
+        end
+        
+    end
+%-----------------------------------------------------------------------
+% end of code
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
