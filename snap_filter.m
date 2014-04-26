@@ -338,7 +338,7 @@ str='buyer_'; VAR_ARR(idx,1:length(str)) = str;
 %  Create and then hide the GUI as it is being constructed.
 h_fig = figure('Visible','off','MenuBar','none','toolbar','none',...
     'numbertitle','off','Position',[1,1,720,650],'name','Snap: filter',...
-    'CloseRequestFcn',{@exit_callback});
+    'CloseRequestFcn',{@exit_callback},'tag','snap_filter');
 
 %---------------------------------------------------------------------
 %  Construct the components of the figure
@@ -520,6 +520,11 @@ set(h_fig,'Visible','on');
 %   the figure has been requested to close
     function exit_callback(source,eventdata)
         
+        % if snap exist refocus on that
+        master_handle = findall(0,'tag','snap');
+        if ishandle(master_handle)
+            figure(master_handle);
+        end
         delete(h_fig);
         
     end
@@ -1138,36 +1143,3 @@ set(h_fig,'Visible','on');
 %-----------------------------------------------------------------------
 % end of code
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

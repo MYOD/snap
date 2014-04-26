@@ -218,7 +218,7 @@ end
 %  Create and then hide the GUI as it is being constructed.
 h_fig = figure('Visible','off','MenuBar','none','toolbar','none',...
     'numbertitle','off','Position',[1,11,720,650],'name','Snap: input',...
-    'CloseRequestFcn',{@exit_callback});
+    'CloseRequestFcn',{@exit_callback},'tag','snap_in');
 
 %---------------------------------------------------------------------
 %  Construct the components of the figure
@@ -2555,17 +2555,13 @@ set(h_fig,'Visible','on');
 %   the figure has been requested to close
     function exit_callback(source,eventdata)
         
-        
-        % to display a question dialog box
-%         selection = questdlg('Close This Figure?',...
-%             'Close Request Function',...
-%             'Yes','No','Yes');
-%         switch selection,
-%             case 'Yes',
+        % if snap exist refocus on that
+        master_handle = findall(0,'tag','snap');
+        if ishandle(master_handle)
+            figure(master_handle);
+        end
         delete(h_fig)
-%             case 'No'
-%                 return
-%         end
+
     end
 
 %   limit the number of characters in a editbox

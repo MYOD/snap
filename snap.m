@@ -7,6 +7,21 @@ function snap
 %---------------------------------------------------------------------
 % Initialization tasks
 
+% Allow just one instance of snap
+h = findall(0,'tag','snap');
+if ~isempty(h)
+
+      %Figure exists so bring Figure to the focus
+      figure(h);
+      return;
+      
+end;
+
+% variables to avoid opening multiple instances of sub-guis
+filter_handle = false;
+in_handle = false;
+lookup_handle = false;
+
 % define constants
 Y_GAP = 0.1;
 BUTTON_H = 0.09; %popup heights can't be controlled in windows
@@ -18,7 +33,7 @@ TITLE_W = 0.35;
 %  Create and then hide the GUI as it is being constructed.
 h_fig = figure('Visible','off','MenuBar','none','toolbar','none',...
     'numbertitle','off','Position',[1,11,300,400],'name','Snap',...
-    'CloseRequestFcn',{@exit_callback});
+    'CloseRequestFcn',{@exit_callback},'tag','snap');
 
 %---------------------------------------------------------------------
 %  Construct the components of the figure
@@ -92,25 +107,42 @@ set(h_fig,'Visible','on');
 %   user hit Add Property button
     function add_callback(source,eventdata)
         
-        %open snap_in as a blank canvas
-        snap_in(0);
+        if ishandle(in_handle)
+            % already open, bring to focus
+            figure(in_handle);
+        else
+            %open snap_in as a blank canvas
+            snap_in(0);
+            in_handle = findall(0,'tag','snap_in');
+        end
         
     end
 
 %   user hit View/Edit Property button
     function view_callback(source,eventdata)
         
-        %open snap_lookup
-        snap_lookup;
+        if ishandle(lookup_handle)
+            %already open, bring to focus
+            figure(lookup_handle);
+        else
+            %open snap_lookup
+            snap_lookup;
+            lookup_handle = findall(0,'tag','snap_lookup');
+        end
         
     end
 
 %   user hit Analyse button
     function analyse_callback(source,eventdata)
         
-%   open snap_filter
-    snap_filter;
-    
+        if ishandle(filter_handle)
+           %already open, bring to focus
+           figure(filter_handle);
+        else
+            %   open snap_filter
+            snap_filter;
+            filter_handle = findall(0,'tag','snap_filter');
+        end
     end
 
 
