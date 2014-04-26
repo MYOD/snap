@@ -2245,7 +2245,7 @@ set(h_fig,'Visible','on');
                 
                 % store the corresponding agency for this agent
                 idx = strcmp(cellstr(data.agent_names(3:end,:)),tmpVal);
-                data.agents_agency(idx,1:length(tmpVal)) = tmpVal;
+                data.agents_agency(idx,1:length(agency)) = agency;
 
         end  
                 
@@ -2334,7 +2334,7 @@ set(h_fig,'Visible','on');
                 
                 % store the corresponding agency for this agent
                 idx = strcmp(cellstr(data.agent_names(3:end,:)),tmpVal);
-                data.agents_agency(idx,1:length(tmpVal)) = tmpVal;
+                data.agents_agency(idx,1:length(agency)) = agency;
 
         end  
         

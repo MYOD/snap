@@ -12,6 +12,9 @@ POPUP_W = 0.35;
 LIST_H = 0.78;
 LIST_W = 0.8;
 
+% boolean to avoid giving focus back to snap when opening snap_in
+OK = false;
+
 % variables to be shared in callbacks
 suburb_key = 0;
 
@@ -67,12 +70,13 @@ set(h_fig,'Visible','on');
 %   the figure has been requested to close
     function exit_callback(source,eventdata)
         
-        % if snap exist refocus on that
-        master_handle = findall(0,'tag','snap');
-        if ishandle(master_handle)
-            figure(master_handle);
+        if  ~OK % not opening snap_in
+            % if snap exist refocus on that
+            master_handle = findall(0,'tag','snap');
+            if ishandle(master_handle)
+                figure(master_handle);
+            end
         end
-        
         % close sub gui
         delete(h_fig)
 
@@ -119,6 +123,9 @@ set(h_fig,'Visible','on');
 %         %NOTE: known that this will fail if 'string' of address_list is
 %         %empty. Don't care.
         
+        % indicate that another GUI will open so don't refocus on snap
+        OK = true;
+
         % quit this gui
         exit_callback(h_fig,0);
         
