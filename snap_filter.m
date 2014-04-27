@@ -1,7 +1,11 @@
-function snap_filter
+function varargout = snap_filter()
 % GUI snap_filter
 % Purpose is to filter and sort properties for simple and easy analysis
-
+% Secondary purpose is to get predefined variables:
+%       varargout{1} = VAR_ARR - 4D char array holding user-friendly name,
+%                       variable name and type respectively
+%       Note to access secondary purpose must call function with exactly
+%       one output. Function will return variable and exit.
 %---------------------------------------------------------------------
 % Initialization tasks
 
@@ -46,6 +50,11 @@ V1 = 1;
 V2 = 2;
 DESC = 3;
 KEYWORD = 4;
+% index constants for VAR_ARR
+NAME = 1; % user friendly description
+VAR = 2; % programming variable
+TYPE = 3; % variable type: logical, *int*, char*
+CONTROL = 4; % variable name of associated uicontrol
 XLSTR = 200; % length of notes strings
 STR = 20; % standard string length
 HIGH_ROWS =6;
@@ -219,120 +228,242 @@ VAR_ROWS = ADDRESS_ROWS + BUILD_ROWS + CONSTRUCTION_ROWS + ROOFING_ROWS + ...
     FRONT_YARD_ROWS + FRONT_FACADE_ROWS + PARKING_ROWS + FLOORING_ROWS + ...
     KITCHEN_ROWS + BATHROOM_ROWS + BEDROOM_ROWS + CLIMATE_ROWS + ...
     BACK_YARD_ROWS + OTHER_ROWS + INSPECTION_ROWS + SALES_ROWS + NOTES_ROWS;
-DESC_ARR = repmat(' ',VAR_ROWS,STR); % holds user friendly descriptions
-VAR_ARR = repmat(' ',VAR_ROWS,STR); % holds corresponding variable names
-DESC_ARR(:,:) = [ADDRESS_STRS; BUILD_STRS; CONSTRUCTION_STRS; ROOFING_STRS; ...
+% DESC_ARR = repmat(' ',VAR_ROWS,STR); % holds user friendly descriptions
+VAR_ARR = repmat(' ',[VAR_ROWS,STR, 3]); % holds corresponding variable names
+VAR_ARR(:,:,NAME) = [ADDRESS_STRS; BUILD_STRS; CONSTRUCTION_STRS; ROOFING_STRS; ...
     FRONT_YARD_STRS; FRONT_FACADE_STRS; PARKING_STRS; FLOORING_STRS; ...
     KITCHEN_STRS; BATHROOM_STRS; BEDROOM_STRS; CLIMATE_STRS; BACK_YARD_STRS;...
     OTHER_STRS; INSPECTION_STRS; SALES_STRS; NOTES_STRS];
+XSCH = 'char5';
+SCH = 'char8';
+LCH = 'char20';
+CH28 = 'char28';
+XLCH = 'char200';
+I8 = 'int8';
+U8 = 'uint8';
+U16 = 'uint16';
+U32 = 'uint32';
+LOG = 'logical';
 idx = 1;
-str='unit_no'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='street_no'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='street'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='st_type'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='suburb'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='built'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='last_reno'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='modern'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='maisonette'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='land_area'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='floor_area'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='frontage'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='construction'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='construction_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='roofing'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='roofing_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='roofing_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_yard_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_yard_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_yard_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_facade'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_facade_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='front_facade_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='garages'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='carports'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='secures'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='offstreets'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='parking_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='parking_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='dual_access'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='tile'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='slate'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='floorboard'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='vinyl'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='carpet'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='flooring_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='flooring_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='open_living'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='pantry'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='kitchen_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='kitchen_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='kitchen_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='baths'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='showers'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='toilets'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='spas'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bathroom_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bathroom_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bathroom_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='heatlamp'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bedrooms'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='wirs'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='birs'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='kids'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='ensuites'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='brts'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bedroom_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bedroom_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='bedroom_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='heating'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='cooling'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='coverage'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='back_yard_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='back_yard_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='back_yard_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='pergola'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='verandah'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='verandah_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='verandah_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='verandah_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='grass'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='grass_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='grass_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='grass_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='swim'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='swim_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='swim_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='swim_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='shed'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='shed_types'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='granny_flat'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='granny_flat_c'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='granny_flat_d'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='granny_flat_s'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='inspect_date'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='inspect_start'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='inspect_end'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='low_list_price_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='high_list_price_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='list_date_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='list_agent_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='agency_old'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='low_list_price_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='high_list_price_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='list_date_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='list_agent_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='agency_curr'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='sold_price'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='sold_date'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='idea_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='general_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='suburb_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='street_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='local_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='agent_'; VAR_ARR(idx,1:length(str)) = str; idx = idx + 1;
-str='buyer_'; VAR_ARR(idx,1:length(str)) = str;
+str='unit_no'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='street_no'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='street'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='st_type'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='suburb'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='built'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=U16; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='last_reno'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=U16; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='modern'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='maisonette'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='land_area'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U16; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='floor_area'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U16; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='frontage'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='construction'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='construction_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='roofing'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='roofing_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='roofing_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_yard_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_yard_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_yard_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_facade'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_facade_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='front_facade_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='garages'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='carports'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='secures'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='offstreets'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='parking_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='parking_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='dual_access'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='tile'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='slate'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='floorboard'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='vinyl'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='carpet'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='flooring_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='flooring_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='open_living'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='pantry'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='kitchen_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='kitchen_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='kitchen_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='baths'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='showers'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='toilets'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='spas'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bathroom_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bathroom_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bathroom_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='heatlamp'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bedrooms'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='wirs'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='birs'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='kids'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='ensuites'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='brts'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bedroom_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bedroom_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='bedroom_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='heating'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='cooling'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='coverage'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='back_yard_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='back_yard_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='back_yard_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='pergola'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='verandah'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='verandah_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='verandah_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='verandah_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='grass'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='grass_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='grass_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='grass_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='swim'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='swim_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='swim_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='swim_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='shed'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='shed_types'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='granny_flat'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='granny_flat_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='granny_flat_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='granny_flat_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='inspect_date'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='inspect_start'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XSCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='inspect_end'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XSCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='low_list_price_old'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='high_list_price_old'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='list_date_old'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='list_agent_old'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='agency_old'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=CH28; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='low_list_price_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='high_list_price_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='list_date_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='list_agent_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='agency_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=CH28; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='sold_price'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='sold_date'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='idea_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='general_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='suburb_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='street_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='local_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='agent_'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='buyer_'; VAR_ARR(idx,1:length(str),VAR) = str;
+str=XLCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 
+%---------------------------------------------------------------------
+%  Secondary purpose of function: if two outputs return ARRays and exit
+if nargout == 1
+    varargout{1} = VAR_ARR;
+    return;
+end
 
 %---------------------------------------------------------------------
 %  Create and then hide the GUI as it is being constructed.
@@ -394,7 +525,8 @@ jtable.setPreserveSelectionsAfterSorting(true);
 % bottom panel components
 info_panel = uipanel('title','Info','position',...
     [X_GAP, Y_GAP, FULL_W, INFO_H],'Units','normalized');
-
+info_txt = uicontrol('parent',info_panel,'Style','text',...
+    'Units','normalized','Position',[X_GAP, Y_GAP, FULL_W, FULL_W]);
 
 %---------------------------------------------------------------------
 %  Construct the components of the display panel
@@ -917,25 +1049,24 @@ set(h_fig,'Visible','on');
         for i = 1:length(table_headings)
             
             % this is a column heading as a cellstr
-            idx = strcmp(DESC_ARR,table_headings(i));
-            var = deblank(VAR_ARR(idx,:));
+            idx = strcmp(VAR_ARR(:,:,NAME),table_headings(i));
+            var = deblank(VAR_ARR(idx,:,VAR));
             
             if ~isfield(data,var) % implies comment column
                 
                 % keep_rows encoded by its indices
                 keep_coded = (1:length(keep_rows))'.*keep_rows;
-                % remove zero elements: each element is a row in table,
-                % value is indice of data
-                keep_bare = keep_coded(keep_coded~=0);
-                % LHS: only assign to rows where comment exists
-                data_idx = eval(['ismember(keep_bare, data.' var 'key(1:data.' ...
+                % remove zero elements
+                keep_coded = keep_coded(keep_coded~=0);
+                % remove rows that don't have a note
+                keep_coded = eval(['intersect(keep_coded,data. ' var 'key)']);
+                
+                % RHS
+                % get the indices of key where the value of key == index of LHS 
+                [~, notes_idx] = eval(['ismember(keep_coded, data.' var 'key(1:data.' ...
                     var 'idx - 1))']);
-                
-                % calculate the logical indices of RHS (w.r.t. notes)
-                notes_idx = eval(['ismember(data.' var 'key(1:data.' ...
-                    var 'idx - 1),keep_coded)']);
-                
-                table_datum(data_idx,i) = cellstr(...
+                                
+                table_datum(true(size(keep_coded)),i) = cellstr(...
                     eval(['data.' var 'notes(notes_idx,:)']));
                 
             elseif eval(['ischar(data.' var ')']) % implies strings column
@@ -953,18 +1084,20 @@ set(h_fig,'Visible','on');
         % make changes seen in the table
         set(table, 'ColumnName', table_headings); %headings
         set(table,'data',table_datum);
-        %
+        % inform user of number of entries
+        set(info_txt,'String',[num2str(sum(keep_rows)) ' entries']);
+        
     end
 
 %function: prep filters
 % description: uses the selection to decide state of filter
 %              components
-% inputs: selection - string should be a member of DESC_ARR
+% inputs: selection - string should be a member of VAR_ARR(:,:,NAME)
 %                       - selection needn't be deblanked
     function prep_filters(selection)
         
-        idx = strcmp(DESC_ARR,cellstr(selection));
-        var = deblank(VAR_ARR(idx,:)); % corresponding variable name
+        idx = strcmp(VAR_ARR(:,:,NAME),cellstr(selection));
+        var = deblank(VAR_ARR(idx,:,VAR)); % corresponding variable name
         
         % reset value of popup (as options will likely change
         set(filter_popup,'value',1);
@@ -1046,8 +1179,8 @@ set(h_fig,'Visible','on');
     function filter_rows(v1,v2,desc,keyword)
         
         % find correspoding variable
-        idx = strcmp(cellstr(desc),DESC_ARR);
-        var = deblank(VAR_ARR(idx,:));
+        idx = strcmp(cellstr(desc),VAR_ARR(:,:,NAME));
+        var = deblank(VAR_ARR(idx,:,VAR));
                 
         switch keyword
             
