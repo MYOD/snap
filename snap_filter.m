@@ -595,7 +595,7 @@ filter_to_edit = uicontrol('parent',display_panel,'Style','edit',...
 
 tmp_x = tmp_x_copy;
 filters_list = uicontrol('parent',display_panel,'Style','listbox',...
-    'Units','normalized','String',{},'Position', ...
+    'Units','normalized','String',{},'Value',[],'Position', ...
     [tmp_x tY_GAP 1.2*tLIST_W 0.6*tFULL_H],'min',0,'max',2);
 
 
@@ -976,13 +976,19 @@ set(h_fig,'Visible','on');
 %   in filter mode this is 'Remove'
     function default_callback(source, eventdata)
         
+        % In filter mode this button means remove existing filter(s)
         if get(high_list,'UserData') == FILTER_MODE
             
             % recover selections from filter list
             bad_idx = get(filters_list,'value');
             
+            if isempty(bad_idx)
+                warndlg(['You must select one or more existing filters' ...
+                    ' from the filters list to remove'],'No Selection Made');
+                return;
+            end
             % remove selections from filter list
-            set(filters_list,'value',1); % as options will change
+            set(filters_list,'value',[]); % as options will change
             str = get(filters_list,'string');
             str(bad_idx,:) = [];
             set(filters_list,'string',str);

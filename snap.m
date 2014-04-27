@@ -17,22 +17,22 @@ if ~isempty(h)
       
 end;
 
-% variables to avoid opening multiple instances of sub-guis
-filter_handle = false;
-in_handle = false;
-lookup_handle = false;
-
 % define constants
 Y_GAP = 0.1;
 BUTTON_H = 0.09; %popup heights can't be controlled in windows
 BUTTON_W = 0.35;
 TITLE_H = 0.13;
 TITLE_W = 0.35;
+GUI_W = 300;
+GUI_H = 400;
 
+% position the GUI just to the right a bit
+screen = get(0,'ScreenSize');
 
 %  Create and then hide the GUI as it is being constructed.
 h_fig = figure('Visible','off','MenuBar','none','toolbar','none',...
-    'numbertitle','off','Position',[1,11,300,400],'name','Snap',...
+    'numbertitle','off','Position',[screen(3)/2,(screen(4) - GUI_W)/2, ...
+    GUI_W,GUI_H],'name','Snap',...
     'CloseRequestFcn',{@exit_callback},'tag','snap');
 
 %---------------------------------------------------------------------
@@ -73,7 +73,7 @@ info_txt = uicontrol('parent',h_fig,'Style','text',...
 
 
 % Move the GUI to the center of the screen.
-movegui(h_fig,'center')
+% movegui(h_fig,'east')
 
 % Make the GUI visible.
 set(h_fig,'Visible','on');
@@ -99,6 +99,12 @@ set(h_fig,'Visible','on');
                 return
         end
         
+        %close sub-GUIs if any open
+        filter_handle = findall(0,'tag','snap_in');
+        filter_handle = [filter_handle; findall(0,'tag','snap_filter')];
+        filter_handle = [filter_handle; findall(0,'tag','snap_lookup')];
+        delete(filter_handle);
+                
         % close the gui
         delete(h_fig);
         
@@ -107,13 +113,16 @@ set(h_fig,'Visible','on');
 %   user hit Add Property button
     function add_callback(source,eventdata)
         
-        if ishandle(in_handle)
+        % check if it exists
+        in_handle = findall(0,'tag','snap_in');
+        
+        if ~isempty(in_handle)
             % already open, bring to focus
             figure(in_handle);
         else
             %open snap_in as a blank canvas
             snap_in(0);
-            in_handle = findall(0,'tag','snap_in');
+            
         end
         
     end
@@ -121,13 +130,15 @@ set(h_fig,'Visible','on');
 %   user hit View/Edit Property button
     function view_callback(source,eventdata)
         
-        if ishandle(lookup_handle)
+        %check if sub-GUI is already open
+        lookup_handle = findall(0,'tag','snap_lookup');
+        
+        if ~isempty(lookup_handle)
             %already open, bring to focus
             figure(lookup_handle);
         else
             %open snap_lookup
             snap_lookup;
-            lookup_handle = findall(0,'tag','snap_lookup');
         end
         
     end
@@ -135,13 +146,15 @@ set(h_fig,'Visible','on');
 %   user hit Analyse button
     function analyse_callback(source,eventdata)
         
-        if ishandle(filter_handle)
+        %check if sub-GUI is already open
+        filter_handle = findall(0,'tag','snap_filter');
+        
+        if ~isempty(filter_handle)
            %already open, bring to focus
            figure(filter_handle);
         else
             %   open snap_filter
             snap_filter;
-            filter_handle = findall(0,'tag','snap_filter');
         end
     end
 

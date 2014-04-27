@@ -953,7 +953,7 @@ end
 
 
 % Move the GUI to the center of the screen.
-movegui(h_fig,'center')
+movegui(h_fig,'east')
 
 % By default, start on the features tab
 features_callback(features_tab,0);
