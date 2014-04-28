@@ -1061,9 +1061,45 @@ set(h_fig,'Visible','on');
             set(unit_no_edit,'String','')
         end
         
+        if strcmpi(get(list_agent_curr_edit,'Visible'),'on') && ...
+                strcmp(deblank(get(list_agent_curr_edit,'string')),'')
+            
+            errordlg('Attempted to add current agent as empty string',...
+                'Agent Must Have a Name');
+            return;
+            
+        end        
+        
+        if strcmpi(get(list_agent_old_edit,'Visible'),'on') && ...
+                strcmp(deblank(get(list_agent_old_edit,'string')),'')
+            
+            errordlg('Attempted to add old agent as empty string',...
+                'Agent Must Have a Name');
+            return;
+            
+        end
+        
+        if strcmpi(get(agency_old_edit,'Visible'),'on') && ...
+                strcmp(deblank(get(agency_old_edit,'string')),'')
+            errordlg('Attempted to add old agency as empty string',...
+                'Agency Must Have a Name');
+            return;
+        end
+        
+        if strcmpi(get(agency_curr_edit,'Visible'),'on') && ...
+                strcmp(deblank(get(agency_curr_edit,'string')),'')
+            errordlg('Attempted to add current agency as empty string',...
+                'Agency Must Have a Name');
+            return;
+        end
+        
+        
         % get data from GUI components and add to data struct
         controls2data();
     
+        % associate agent with agency
+        associate_agency();
+        
         % expands the number of rows of data struct's elements if necessary
         expand_data();
                 
@@ -1575,6 +1611,82 @@ set(h_fig,'Visible','on');
         
         
     end
+
+
+    % helper fn: associate_agency
+    % purpose is to 'remember' the agency of each agent in the case that
+    % the user has added a new agent or agency
+    function associate_agency()
+
+        % determine where to save
+        if load_idx ~= 0
+            % we want to overwrite this property
+            idx = load_idx;
+        else
+            % we want to add a new property
+            idx = data.idx - 1; % subtract one as we would have already incremented
+        end
+        
+        
+        for curr_old = {'old', 'curr'}
+
+            % user wants to add a new agency
+            if eval(['strcmpi(get(agency_' curr_old{1} '_edit,''Visible''),''on'')'])
+                %add the name to the names list
+                agency = eval(['deblank(get(agency_' curr_old{1} '_edit,''string''))']);
+                data.agencies = [data.agencies; repmat(' ',1,(LSTR +SSTR))];
+                data.agencies(end,1:length(agency)) = agency;
+                % sort it
+                data.agencies = [data.agencies(1:2,:); ...
+                    sortrows(data.agencies(3:end,:))];
+                
+                %           add the name as this properties old agency
+                eval(['data.agency_' curr_old{1} '(idx,1:length(agency)) = agency;']);
+            else % agency is whatever is in the popup box
+                
+                agency = eval(['get(agency_' curr_old{1} '_popup,''String'')']);
+                agency = eval(['deblank(agency(get(agency_' curr_old{1} '_popup,''Value''),:))']);
+                
+            end
+            
+            % get selected agent
+            agent = eval(['get(list_agent_' curr_old{1} '_popup,''String'')']);
+            agent = eval(['deblank(agent(get(list_agent_' curr_old{1} '_popup,''Value''),:))']);
+            
+            % user wants to add a new agent
+            if strcmp(agent,'Add New')
+                
+                %add the name to the names list
+                new_agent = eval(['deblank(get(list_agent_' curr_old{1} '_edit,''string''))']);
+                data.agent_names = [data.agent_names; repmat(' ',1,LSTR)];
+                data.agent_names(end,1:length(new_agent)) = new_agent;
+                %           sort it
+                [sorted, order] = sortrows(data.agent_names(3:end,:));
+                data.agent_names = [data.agent_names(1:2,:); ...
+                    sorted];
+                % store the corresponding agency for this agent
+                data.agents_agency = [data.agents_agency; ...
+                    repmat(' ',1,(LSTR + SSTR))];
+                data.agents_agency(end,1:length(agency)) = agency;
+                % the agents agency list must be sorted in the same way
+                data.agents_agency = data.agents_agency(order,:);
+                
+                %           add the name as this properties old listing agent
+                eval(['data.list_agent_' curr_old{1} '(idx,1:length(new_agent)) = new_agent;']);
+                
+            elseif ~strcmp(agent,'-') % user didn't add a new name, but may have added a different agency for this agent
+                
+                % store the corresponding agency for this agent
+                tmp_idx = strcmp(cellstr(data.agent_names(3:end,:)),agent);
+                data.agents_agency(tmp_idx,1:length(agency)) = agency;
+                
+            end
+            
+            
+        end    
+    end
+
+
 
 
 
