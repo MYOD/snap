@@ -1644,7 +1644,7 @@ set(h_fig,'Visible','on');
                 % add the name as this properties old agency
                 eval(['data.agency_' curr_old{1} '(idx,:) = [agency, ' ...
                     'repmat('' '',1,size(data.agency_' curr_old{1} ',2) '...
-                    '- length(agency)))];']);
+                    '- length(agency))];']);
             else % agency is whatever is in the popup box
                 
                 agency = eval(['get(agency_' curr_old{1} '_popup,''String'')']);
@@ -1679,7 +1679,7 @@ set(h_fig,'Visible','on');
                 %           add the name as this properties old listing agent
                 eval(['data.list_agent_' curr_old{1} '(idx,:) = [new_agent, ' ...
                     'repmat('' '',1,size(data.list_agent_' curr_old{1} ',2) '...
-                    '- length(new_agent)))];']);
+                    '- length(new_agent))];']);
                 
             elseif ~strcmp(agent,'-') % user didn't add a new name, but may have added a different agency for this agent
                 
