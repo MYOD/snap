@@ -58,6 +58,7 @@ VAR_ARR = snap_filter();
 % load key data
 data_file = 'snap_data/snap_data.mat';
 if exist(data_file,'file')
+    data = 0; % avoids runtime error
     load(data_file);
     
 % first time initialisation    
@@ -1634,17 +1635,24 @@ set(h_fig,'Visible','on');
             if eval(['strcmpi(get(agency_' curr_old{1} '_edit,''Visible''),''on'')'])
                 %add the name to the names list
                 agency = eval(['deblank(get(agency_' curr_old{1} '_edit,''string''))']);
-                data.agencies = [data.agencies; repmat(' ',1,(LSTR +SSTR))];
-                data.agencies(end,:) = [agency, repmat(' ',1,...
-                    size(data.agencies,2) - length(agency))];
-                % sort it
-                data.agencies = [data.agencies(1:2,:); ...
-                    sortrows(data.agencies(3:end,:))];
-                
-                % add the name as this properties old agency
-                eval(['data.agency_' curr_old{1} '(idx,:) = [agency, ' ...
-                    'repmat('' '',1,size(data.agency_' curr_old{1} ',2) '...
-                    '- length(agency))];']);
+                matches = strcmp(cellstr(agency),data.agencies);
+                if sum(matches) == 0 % haven't yet added this agency
+                    data.agencies = [data.agencies; repmat(' ',1,(LSTR +SSTR))];
+                    data.agencies(end,:) = [agency, repmat(' ',1,...
+                        size(data.agencies,2) - length(agency))];
+                    % sort it
+                    data.agencies = [data.agencies(1:2,:); ...
+                        sortrows(data.agencies(3:end,:))];
+                    
+                    % add the name as this properties old agency
+                    eval(['data.agency_' curr_old{1} '(idx,:) = [agency, ' ...
+                        'repmat('' '',1,size(data.agency_' curr_old{1} ',2) '...
+                        '- length(agency))];']);
+                else % already added the agency
+                    errordlg('Attempted to add existing agency',...
+                        'Attempted To Add Existing Agency');
+                    return;
+                end
             else % agency is whatever is in the popup box
                 
                 agency = eval(['get(agency_' curr_old{1} '_popup,''String'')']);
@@ -1661,25 +1669,32 @@ set(h_fig,'Visible','on');
                 
                 %add the name to the names list
                 new_agent = eval(['deblank(get(list_agent_' curr_old{1} '_edit,''string''))']);
-                data.agent_names = [data.agent_names; repmat(' ',1,LSTR)];
-                data.agent_names(end,:) = [new_agent, repmat(' ',1,...
-                    size(data.agent_names,2) - length(new_agent))];
-                %           sort it
-                [sorted, order] = sortrows(data.agent_names(3:end,:));
-                data.agent_names = [data.agent_names(1:2,:); ...
-                    sorted];
-                % store the corresponding agency for this agent
-                data.agents_agency = [data.agents_agency; ...
-                    repmat(' ',1,(LSTR + SSTR))];
-                data.agents_agency(end,:) = [agency, repmat(' ',1,...
-                    size(data.agents_agency,2) - length(agency))];
-                % the agents agency list must be sorted in the same way
-                data.agents_agency = data.agents_agency(order,:);
-                
-                %           add the name as this properties old listing agent
-                eval(['data.list_agent_' curr_old{1} '(idx,:) = [new_agent, ' ...
-                    'repmat('' '',1,size(data.list_agent_' curr_old{1} ',2) '...
-                    '- length(new_agent))];']);
+                matches = strcmp(cellstr(new_agent),data.agent_names);
+                if sum(matches) == 0 % haven't yet added this agent
+                    data.agent_names = [data.agent_names; repmat(' ',1,LSTR)];
+                    data.agent_names(end,:) = [new_agent, repmat(' ',1,...
+                        size(data.agent_names,2) - length(new_agent))];
+                    %           sort it
+                    [sorted, order] = sortrows(data.agent_names(3:end,:));
+                    data.agent_names = [data.agent_names(1:2,:); ...
+                        sorted];
+                    % store the corresponding agency for this agent
+                    data.agents_agency = [data.agents_agency; ...
+                        repmat(' ',1,(LSTR + SSTR))];
+                    data.agents_agency(end,:) = [agency, repmat(' ',1,...
+                        size(data.agents_agency,2) - length(agency))];
+                    % the agents agency list must be sorted in the same way
+                    data.agents_agency = data.agents_agency(order,:);
+                    
+                    %           add the name as this properties old listing agent
+                    eval(['data.list_agent_' curr_old{1} '(idx,:) = [new_agent, ' ...
+                        'repmat('' '',1,size(data.list_agent_' curr_old{1} ',2) '...
+                        '- length(new_agent))];']);
+                else % already added the agent
+                    errordlg('Attempted to add existing agent',...
+                        'Attempted To Add Existing Agent');
+                    return;
+                end
                 
             elseif ~strcmp(agent,'-') % user didn't add a new name, but may have added a different agency for this agent
                 
