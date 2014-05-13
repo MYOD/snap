@@ -105,8 +105,8 @@ street_edit = uicontrol('parent',h_fig,'Style','edit',...
     'userData',LSTR);
 TMP_X=TMP_X+X_GAP+TXT_W;
 st_type_popup = uicontrol('parent',h_fig,'Style','popup',...
-    'Units','normalized','String',{'Ave','Bowl','Cct','Cl','Cres','Ct',...
-    'Dr','Gr','Rd','St',},...
+    'Units','normalized','String',{'Ave','Bowl','Cct','Cl','Cres','Crt',...
+    'Dr','Gr','Pl','Rd','Rise','St','Tce'},...
     'Position', [TMP_X,LINE_Y,STXT_W,POPUP_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
 suburb_popup = uicontrol('parent',h_fig,'Style','popup',...
@@ -1476,6 +1476,43 @@ set(h_fig,'Visible','on');
                     end
                 end
                 
+            elseif strcmp(var,'dom') % calculate the days on market
+                
+                % get sale date, list date- curr & list date- old
+                s_date = deblank(get(sold_date_edit, 'String'));
+                lo_date = deblank(get(list_date_old_edit,'String'));
+                lc_date = deblank(get(list_date_curr_edit,'string'));
+                
+                % can't calculate DOM without a sold date
+                if strcmp(s_date,'') || strcmp(s_date,'dd/mm/yy') % no sold date
+                   
+                    data.dom(idx) = 0;
+                    
+                else % is a sold date, try to find when it was first advertised
+                    
+                    if strcmp(lo_date,'') || strcmp(lo_date,'dd/mm/yy') % no old list date
+                        
+                        % check if there is a current list date
+                        if strcmp(lc_date,'') || strcmp(lc_date,'dd/mm/yy') % no current list date
+                            data.dom(idx) = 0;
+                        else % DOM = sold date - curr list date + 1
+                            % convert dates to numbers
+                            s_date = datenum(s_date,'dd/mm/yy');
+                            lc_date = datenum(lc_date,'dd/mm/yy');
+                            data.dom(idx) = s_date - lc_date + 1;
+                            
+                        end
+                    
+                    else % DOM = sold date - old list date + 1
+                       % convert dates to numbers
+                       s_date = datenum(s_date,'dd/mm/yy');
+                       lo_date = datenum(lo_date,'dd/mm/yy');
+                       data.dom(idx) = s_date - lo_date + 1;
+                    end
+                    
+                end
+                
+                
             else
                 errordlg('Unaccounted for situation. Please tell Peter.',...
                     'Peter Forgot Something');
@@ -1540,6 +1577,10 @@ set(h_fig,'Visible','on');
                    eval(['set(' var 'notes_edit,''string'',data.' var 'notes(tmpIndexed,:))']);
                end
                
+           elseif strcmp(var,'dom')
+               
+               % do nothing - these variables don't have anything to do
+               % with the snap_in GUI.
                
            else
                errordlg('Unaccounted for situation. Please tell Peter.',...
