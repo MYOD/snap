@@ -7,6 +7,8 @@ function varargout = snap_filter()
 %       Note to access secondary purpose must call function with exactly
 %       one output. Function will return variable and exit.
 %---------------------------------------------------------------------
+
+
 % Initialization tasks
 
 % the headings control the data in the table
@@ -36,6 +38,14 @@ tBUTTON_W = 0.12;
 tBUTTON_H = 0.18;
 tTXT_W = 0.08;
 tTXT_H = 0.18;
+
+% NOTES on use of USERDATA in snap_filter
+% filter_popup: reserved to hold type IS_LOGIC, IS_CHAR, IS_NUM
+%               of selection in list box
+% high_list: reserved to hold state panel selected IS_DISPLAY, IS_FILTER
+%            note that value of IS_DISPLAY chosen to allow multiple
+%            selection in listbox.
+
 % states
 DISPLAY_MODE = 2;
 FILTER_MODE = 0;
@@ -791,6 +801,8 @@ set(h_fig,'Visible','on');
         % reset value to 1
         set(med_list,'Value',1);
         
+        % change contents of med_list accordingly and conditionally enable
+        % mutiple selection
         switch selection
             case 'Address'
                 set(med_list,'string',ADDRESS_STRS);
@@ -825,7 +837,7 @@ set(h_fig,'Visible','on');
         selection = deblank(HIGH_STRS(get(high_list,'Value'),:));
         
         switch selection
-            case 'Features' % only one requiring low level list
+            case 'Features' % only when 'Features' is selected is a low list needed
                 
                 % reset value to 1
                 set(low_list,'Value',1);
@@ -833,6 +845,7 @@ set(h_fig,'Visible','on');
                 med_select = ...
                     deblank(FEATURES_STRS(get(med_list,'Value'),:));
                 
+                % change the contents of low level list
                 switch med_select
                     case 'Construction'
                         set(low_list,'string',CONSTRUCTION_STRS);
@@ -881,17 +894,6 @@ set(h_fig,'Visible','on');
                     med_selection = med_selection(get(med_list,'Value'),:);
                     prep_filters(med_selection);
                     
-                    %                     idx = strcmp(DESC_ARR,cellstr(med_selection));
-                    %                     var = deblank(VAR_ARR(idx,:));
-                    %
-                    %                     if ~isfield(data,var) % implies comment column
-                    %
-                    %
-                    %                         %                     set(filter_from_edit,'visible','on');
-                    %                         %                     set(filter_and,'visible','on');
-                    %                         %                     set(filter_to_edit,'visible','on');
-                    %
-                    %                     end
                 end
         end
         
@@ -914,7 +916,8 @@ set(h_fig,'Visible','on');
         
     end
 
-%   user pressed the add/remove button in display panel
+%   user pressed the add/remove button in display mode OR 
+%                the 'Add New Filter' in filter mode
 %   add or remove the selected columns
     function add_callback(source, eventdata)
         
@@ -990,6 +993,7 @@ set(h_fig,'Visible','on');
                     ' from the filters list to remove'],'No Selection Made');
                 return;
             end
+            
             % remove selections from filter list
             set(filters_list,'value',[]); % as options will change
             str = get(filters_list,'string');
@@ -1131,6 +1135,35 @@ set(h_fig,'Visible','on');
         
     end
 
+
+%function: var_state
+% description: determines if var is a char, logical or num
+% inputs: desc - string should be a member of VAR_ARR(:,:,NAME)
+%                       - selection needn't be deblanked
+% outputs: state - IS_NUM, IS_LOGIC or IS_CHAR
+    function state = var_state(desc)
+        
+        idx = strcmp(VAR_ARR(:,:,NAME),cellstr(desc));
+        var = deblank(VAR_ARR(idx,:,VAR)); % corresponding variable name
+        
+        if ~isfield(data,var) || eval(['ischar(data.' var ')']) % made of chars
+            state = IS_CHAR;
+        elseif eval(['islogical(data.' var ')']) % logical
+            state = IS_LOGIC;
+        elseif eval(['isnumeric(data.' var ')']) %numeric
+            state = IS_NUM;
+        else
+            errordlg('Unknown Var State! Please tell Peter', 'Unknown Type');
+            return;
+        end
+ 
+    end
+
+
+
+
+
+
 % function: disp_command
 % description: will add a human readable line to the filter list
 %                  explaining purpose of filter
@@ -1196,7 +1229,7 @@ set(h_fig,'Visible','on');
             % could be logical, char, or comment
             case 'Is'
                 
-                if get(filter_popup,'UserData') == IS_LOGIC
+                if var_state(desc) == IS_LOGIC
                     
                     keep_rows = keep_rows & eval(['data.' var ...
                         '(1:length(keep_rows));']);
@@ -1229,7 +1262,7 @@ set(h_fig,'Visible','on');
             case 'Is Not'
                 
                 
-                if get(filter_popup,'UserData') == IS_LOGIC
+                if var_state(desc) == IS_LOGIC
                     
                     keep_rows = keep_rows & ~eval(['data.' var ...
                         '(1:length(keep_rows));']);
