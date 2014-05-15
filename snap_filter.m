@@ -71,20 +71,22 @@ HIGH_ROWS =6;
 ADDRESS_ROWS = 5;
 BUILD_ROWS = 7;
 FEATURES_ROWS=12;
+BLOCK_ROWS=5;
 CONSTRUCTION_ROWS=2;
-ROOFING_ROWS=3;
+ROOFING_ROWS=4;
 FRONT_YARD_ROWS=3;
 FRONT_FACADE_ROWS=3;
 PARKING_ROWS=7;
 FLOORING_ROWS=7;
 KITCHEN_ROWS=5;
+LIVING_ROWS=3;
 BATHROOM_ROWS=8;
 BEDROOM_ROWS=9;
 CLIMATE_ROWS=3;
-BACK_YARD_ROWS=12;
+BACK_YARD_ROWS=13;
 OTHER_ROWS=10;
 INSPECTION_ROWS=3;
-SALES_ROWS=13;
+SALES_ROWS=14;
 NOTES_ROWS=7;
 % string arrays
 BOOLEAN_STRS = {'Is','Is Not'};
@@ -123,13 +125,20 @@ str='Bedroom'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Climate Control'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Back Yard'; FEATURES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Other'; FEATURES_STRS(idx,1:length(str)) = str;
+BLOCK_STRS = repmat(' ',BLOCK_ROWS,STR); idx = 1;
+str='Corner?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Highset?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Lowset?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Noisy/Busy?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Sloped?'; BLOCK_STRS(idx,1:length(str)) = str; 
 CONSTRUCTION_STRS = repmat(' ',CONSTRUCTION_ROWS,STR); idx = 1;
 str='Construction'; CONSTRUCTION_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Construction)'; CONSTRUCTION_STRS(idx,1:length(str)) = str;
 ROOFING_STRS = repmat(' ',ROOFING_ROWS,STR); idx = 1;
 str='Roofing'; ROOFING_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Roofing)'; ROOFING_STRS(idx,1:length(str)) = str; idx = idx + 1;
-str='D (Roofing)'; ROOFING_STRS(idx,1:length(str)) = str;
+str='D (Roofing)'; ROOFING_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='High Ceilings?'; ROOFING_STRS(idx,1:length(str)) = str;
 FRONT_YARD_STRS = repmat(' ',FRONT_YARD_ROWS,STR); idx = 1;
 str='C (Front Yard)'; FRONT_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Front Yard)'; FRONT_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -160,15 +169,19 @@ str='Pantry?'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Kitchen)'; KITCHEN_STRS(idx,1:length(str)) = str;
+LIVING_STRS = repmat(' ',LIVING_ROWS,STR); idx = 1;
+str='C (Living)'; LIVING_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='D (Living)'; LIVING_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='S (Living)'; LIVING_STRS(idx,1:length(str)) = str;
 BATHROOM_STRS = repmat(' ',BATHROOM_ROWS,STR); idx = 1;
 str='# Baths'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Showers'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Toilets'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# Spas'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='# WCs'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
-str='S (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
-str='Heatlamps?'; BATHROOM_STRS(idx,1:length(str)) = str;
+str='S (Bathroom)'; BATHROOM_STRS(idx,1:length(str)) = str; 
 BEDROOM_STRS = repmat(' ',BEDROOM_ROWS,STR); idx = 1;
 str='# Bedrooms'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='# WIRs'; BEDROOM_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -187,8 +200,9 @@ BACK_YARD_STRS = repmat(' ',BACK_YARD_ROWS,STR); idx = 1;
 str='C (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Back Yard)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
-str='Pergola?'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Verandah?'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Pergola?'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Alfresco?'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Verandah)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='D (Verandah)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='S (Verandah)'; BACK_YARD_STRS(idx,1:length(str)) = str; idx = idx + 1;
@@ -222,6 +236,7 @@ str='Curr Ask High ($)'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Curr Asking Date'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Curr Agent'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Curr Agency'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='Agent Start Date'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Sold Price ($)'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Sold Date'; SALES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Days on Market'; SALES_STRS(idx,1:length(str)) = str;
@@ -235,15 +250,15 @@ str='Agent Notes'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Buyer Types'; NOTES_STRS(idx,1:length(str)) = str; idx = idx + 1;
 
 % construct arrays that maps lowest level descriptions to variables
-VAR_ROWS = ADDRESS_ROWS + BUILD_ROWS + CONSTRUCTION_ROWS + ROOFING_ROWS + ...
+VAR_ROWS = ADDRESS_ROWS + BUILD_ROWS + BLOCK_ROWS + CONSTRUCTION_ROWS + ROOFING_ROWS + ...
     FRONT_YARD_ROWS + FRONT_FACADE_ROWS + PARKING_ROWS + FLOORING_ROWS + ...
-    KITCHEN_ROWS + BATHROOM_ROWS + BEDROOM_ROWS + CLIMATE_ROWS + ...
+    KITCHEN_ROWS + LIVING_ROWS + BATHROOM_ROWS + BEDROOM_ROWS + CLIMATE_ROWS + ...
     BACK_YARD_ROWS + OTHER_ROWS + INSPECTION_ROWS + SALES_ROWS + NOTES_ROWS;
 % DESC_ARR = repmat(' ',VAR_ROWS,STR); % holds user friendly descriptions
 VAR_ARR = repmat(' ',[VAR_ROWS,STR, 3]); % holds corresponding variable names
-VAR_ARR(:,:,NAME) = [ADDRESS_STRS; BUILD_STRS; CONSTRUCTION_STRS; ROOFING_STRS; ...
+VAR_ARR(:,:,NAME) = [ADDRESS_STRS; BUILD_STRS; BLOCK_STRS; CONSTRUCTION_STRS; ROOFING_STRS; ...
     FRONT_YARD_STRS; FRONT_FACADE_STRS; PARKING_STRS; FLOORING_STRS; ...
-    KITCHEN_STRS; BATHROOM_STRS; BEDROOM_STRS; CLIMATE_STRS; BACK_YARD_STRS;...
+    KITCHEN_STRS; LIVING_STRS; BATHROOM_STRS; BEDROOM_STRS; CLIMATE_STRS; BACK_YARD_STRS;...
     OTHER_STRS; INSPECTION_STRS; SALES_STRS; NOTES_STRS];
 XSCH = 'char5';
 SCH = 'char8';
@@ -280,6 +295,16 @@ str='floor_area'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=U16; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='frontage'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=U8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='corner'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='highset'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='lowset'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='noise'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='sloped'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='construction'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='construction_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
@@ -290,6 +315,8 @@ str='roofing_c'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='roofing_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='ceiling'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='front_yard_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='front_yard_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
@@ -340,6 +367,12 @@ str='kitchen_d'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='kitchen_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='living_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='living_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='living_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='baths'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='showers'; VAR_ARR(idx,1:length(str),VAR) = str;  
@@ -348,14 +381,14 @@ str='toilets'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='spas'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='wcs'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='bathroom_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='bathroom_d'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='bathroom_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
-str='heatlamp'; VAR_ARR(idx,1:length(str),VAR) = str;  
-str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='bedrooms'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='wirs'; VAR_ARR(idx,1:length(str),VAR) = str;  
@@ -386,9 +419,11 @@ str='back_yard_d'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='back_yard_s'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='verandah'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='pergola'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
-str='verandah'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str='alfresco'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='verandah_c'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=I8; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
@@ -450,6 +485,8 @@ str='list_agent_curr'; VAR_ARR(idx,1:length(str),VAR) = str;
 str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='agency_curr'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=CH28; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='agent_start'; VAR_ARR(idx,1:length(str),VAR) = str;  
+str=SCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='sold_price'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=U32; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='sold_date'; VAR_ARR(idx,1:length(str),VAR) = str;  
@@ -847,6 +884,8 @@ set(h_fig,'Visible','on');
                 
                 % change the contents of low level list
                 switch med_select
+                    case 'Block'
+                        set(low_list,'string',BLOCK_STRS);
                     case 'Construction'
                         set(low_list,'string',CONSTRUCTION_STRS);
                     case 'Roofing'
@@ -861,6 +900,8 @@ set(h_fig,'Visible','on');
                         set(low_list,'string',FLOORING_STRS);
                     case 'Kitchen'
                         set(low_list,'string',KITCHEN_STRS);
+                    case 'Living'
+                        set(low_list,'string',LIVING_STRS);                        
                     case 'Bathroom'
                         set(low_list,'string',BATHROOM_STRS);
                     case 'Bedroom'
