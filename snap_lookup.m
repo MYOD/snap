@@ -63,6 +63,8 @@ movegui(h_fig,'center')
 % Make the GUI visible.
 set(h_fig,'Visible','on');
 
+% initialise focus
+uicontrol(suburb_popup);
 
 %---------------------------------------------------------------------
     %  Callbacks for MYGUI

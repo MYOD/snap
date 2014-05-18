@@ -1051,11 +1051,11 @@ granny_flat_callback(granny_flat_check,0);
 % improve tab order
 % uistack(features_tab,'down',2);
 
-
 % Make the GUI visible.
 set(h_fig,'Visible','on');
 
-
+% initialise focus 
+uicontrol(street_no_edit);
 
 %---------------------------------------------------------------------
     %  Callbacks for MYGUI

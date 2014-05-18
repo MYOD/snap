@@ -78,6 +78,8 @@ info_txt = uicontrol('parent',h_fig,'Style','text',...
 % Make the GUI visible.
 set(h_fig,'Visible','on');
 
+% initialise focus
+uicontrol(add_button);
 
 %---------------------------------------------------------------------
 %  Callbacks
