@@ -105,12 +105,12 @@ street_edit = uicontrol('parent',h_fig,'Style','edit',...
     'userData',LSTR);
 TMP_X=TMP_X+X_GAP+TXT_W;
 st_type_popup = uicontrol('parent',h_fig,'Style','popup',...
-    'Units','normalized','String',{'Ave','Blv','Bowl','Cct','Cl','Cres','Crt',...
-    'Dr','Gr','Pl','Rd','Rise','St','Tce'},...
+    'Units','normalized','String',{'Type','Ave','Blv','Bowl','Cct',...
+    'Cl','Cres','Crt','Dr','Gr','Pl','Rd','Rise','St','Tce'},...
     'Position', [TMP_X,LINE_Y,STXT_W,POPUP_H]);
 TMP_X=TMP_X+X_GAP+STXT_W;
 suburb_popup = uicontrol('parent',h_fig,'Style','popup',...
-    'Units','normalized','String',{'Craigmore','Elizabeth East',...
+    'Units','normalized','String',{'Suburb','Craigmore','Elizabeth East',...
     'Elizabeth Vale','Ingle Farm','Para Hills','Para Vista'},...
     'Position',[TMP_X,LINE_Y,POPUP_W,POPUP_H]);
 
@@ -1131,20 +1131,38 @@ uicontrol(street_no_edit);
         if strcmp(tmpVal,'Street') || strcmp(tmpVal,'')
             % user didn't enter compulsory value
             errordlg('You must specify a street name!',...
-                'Need Street Name');
+                'Need Street Name!');
             return;
+        end
+        
+        if strcmp(deblank(get(unit_no_edit,'String')),'Unit #')
+            set(unit_no_edit,'String','')
         end
         
         tmpVal = deblank(get(street_no_edit,'String'));
         if strcmp(tmpVal,'St. #') || strcmp(tmpVal,'')
             % user didn't enter compulsory value
             errordlg('You must specify a street number!',...
-                'Need Street Number');
+                'Need Street Number!');
             return;
         end
         
-        if strcmp(deblank(get(unit_no_edit,'String')),'Unit #')
-            set(unit_no_edit,'String','')
+        tmpVal = get(st_type_popup,'String');
+        tmpVal = tmpVal{get(st_type_popup,'Value')};
+        if strcmp(tmpVal,'Type')
+            % user didn't enter compulsory value
+            errordlg('You must specify a street type!',...
+                'Need Street Type!');
+            return;
+        end
+        
+        tmpVal = get(suburb_popup,'String');
+        tmpVal = tmpVal{get(suburb_popup,'Value')};
+        if strcmp(tmpVal,'Suburb')
+            % user didn't enter compulsory value
+            errordlg('You must specify a suburb!',...
+                'Need Suburb!');
+            return;
         end
         
         if strcmpi(get(list_agent_curr_edit,'Visible'),'on') && ...
