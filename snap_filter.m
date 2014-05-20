@@ -71,7 +71,7 @@ HIGH_ROWS =6;
 ADDRESS_ROWS = 5;
 BUILD_ROWS = 7;
 FEATURES_ROWS=12;
-BLOCK_ROWS=5;
+BLOCK_ROWS=6;
 CONSTRUCTION_ROWS=2;
 ROOFING_ROWS=4;
 FRONT_YARD_ROWS=3;
@@ -130,7 +130,8 @@ str='Corner?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Highset?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Lowset?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='Noisy/Busy?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
-str='Sloped?'; BLOCK_STRS(idx,1:length(str)) = str; 
+str='Sloped?'; BLOCK_STRS(idx,1:length(str)) = str; idx = idx + 1;
+str='No-Through?'; BLOCK_STRS(idx,1:length(str)) = str;
 CONSTRUCTION_STRS = repmat(' ',CONSTRUCTION_ROWS,STR); idx = 1;
 str='Construction'; CONSTRUCTION_STRS(idx,1:length(str)) = str; idx = idx + 1;
 str='C (Construction)'; CONSTRUCTION_STRS(idx,1:length(str)) = str;
@@ -304,6 +305,8 @@ str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='noise'; VAR_ARR(idx,1:length(str),VAR) = str; 
 str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='sloped'; VAR_ARR(idx,1:length(str),VAR) = str; 
+str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
+str='no_thru'; VAR_ARR(idx,1:length(str),VAR) = str; 
 str=LOG; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
 str='construction'; VAR_ARR(idx,1:length(str),VAR) = str;  
 str=LCH; VAR_ARR(idx,1:length(str),TYPE) = str; idx = idx + 1;
@@ -1108,19 +1111,22 @@ set(h_fig,'Visible','on');
             
             if ~isfield(data,var) % implies comment column
                 
-                % keep_rows encoded by its indices
-                keep_coded = (1:length(keep_rows))'.*keep_rows;
-                % remove zero elements
-                keep_coded = keep_coded(keep_coded~=0);
-                % remove rows that don't have a note
-                keep_coded = eval(['intersect(keep_coded,data. ' var 'key)']);
+                % data indices of selected rows
+                data_idx = (1:length(keep_rows))'.*keep_rows;
+                data_idx = data_idx(data_idx~=0);
                 
-                % RHS
-                % get the indices of key where the value of key == index of LHS 
-                [~, notes_idx] = eval(['ismember(keep_coded, data.' var 'key(1:data.' ...
-                    var 'idx - 1))']);
+                % remove rows that don't have a note
+                data_idx_notes = eval(['intersect(data_idx,data. ' var 'key)']);
+                
+                % notes indices of selected rows
+                [~, notes_idx] = eval(['ismember(data_idx_notes, data.' ...
+                    var 'key(1:data.' var 'idx - 1))']);
+                
+                % rows logical indices that have notes
+                rows_idx = ismember(data_idx,data_idx_notes);
                                 
-                table_datum(true(size(keep_coded)),i) = cellstr(...
+                % only set rows where a comment exists
+                table_datum(rows_idx,i) = cellstr(...
                     eval(['data.' var 'notes(notes_idx,:)']));
                 
             elseif eval(['ischar(data.' var ')']) % implies strings column
@@ -1247,7 +1253,7 @@ set(h_fig,'Visible','on');
         % add the command to the filter history
         row = size(filter_hist,1) + 1;
         filter_hist{row,V1} = v1;
-        filter_hist{row,V2} = v1;
+        filter_hist{row,V2} = v2;
         filter_hist{row,DESC} = desc;
         filter_hist{row,KEYWORD} = keyword;
         
